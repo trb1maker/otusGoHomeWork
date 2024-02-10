@@ -7,6 +7,8 @@ import (
 	"unicode"
 )
 
+const backSlash rune = 92
+
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(s string) (string, error) {
@@ -20,6 +22,11 @@ func Unpack(s string) (string, error) {
 		item := items[i]
 		if unicode.IsDigit(item) {
 			return "", ErrInvalidString
+		}
+		// Если текущий символ бэкслэш, нужно сдвинуться на следующий символ
+		if item == backSlash {
+			i++
+			item = items[i]
 		}
 		// Последний символ просто записываю в результат
 		if i == lastIndex {
