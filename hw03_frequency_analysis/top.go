@@ -9,7 +9,7 @@ import (
 func Top10(s string) []string {
 	c := make(counter.Counter)
 	for _, w := range strings.Fields(s) {
-		c[w]++
+		c.Add(w)
 	}
 	return c.GetTop()
 }
