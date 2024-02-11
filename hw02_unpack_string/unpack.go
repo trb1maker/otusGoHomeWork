@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-const backSlash rune = 92
+const backSlash rune = '\\'
 
 var ErrInvalidString = errors.New("invalid string")
 
@@ -38,7 +38,7 @@ func Unpack(s string) (string, error) {
 		if unicode.IsDigit(next) {
 			count, err := strconv.Atoi(string(next))
 			if err != nil {
-				panic(err)
+				return "", ErrInvalidString
 			}
 			result.WriteString(strings.Repeat(string(item), count))
 			// Если следующий символ число, то выполнив распаковку я пропускаю уже обработанный символ
