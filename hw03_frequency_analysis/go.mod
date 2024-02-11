@@ -1,4 +1,4 @@
-module github.com/fixme_my_friend/hw03_frequency_analysis
+module github.com/trb1maker/otus_golang_home_work/hw03_frequency_analysis
 
 go 1.19
 
