@@ -25,6 +25,10 @@ func Unpack(s string) (string, error) {
 		}
 		// Если текущий символ бэкслэш, нужно сдвинуться на следующий символ
 		if item == backSlash {
+			// Возможна невалидная строка, когда последний символ - неэкранированный бэкслэш, сдвиг приведет к панике
+			if i == lastIndex {
+				return "", ErrInvalidString
+			}
 			i++
 			item = items[i]
 		}
