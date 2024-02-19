@@ -12,6 +12,7 @@ type lruCache struct {
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
+	keys     map[*ListItem]Key
 }
 
 func (l *lruCache) Set(key Key, value interface{}) bool {
@@ -21,9 +22,12 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 		return true
 	}
 	if l.queue.Len() == l.capacity {
-		l.queue.Remove(l.queue.Back())
+		unused := l.queue.Back()
+		l.queue.Remove(unused)
+		delete(l.items, l.keys[unused])
 	}
-	l.items[key] = l.queue.PushFront(value)
+	item := l.queue.PushFront(value)
+	l.items[key], l.keys[item] = item, key
 	return false
 }
 
@@ -45,5 +49,6 @@ func NewCache(capacity int) Cache {
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
+		keys:     make(map[*ListItem]Key),
 	}
 }
