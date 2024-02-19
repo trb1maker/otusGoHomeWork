@@ -86,7 +86,11 @@ func TestCache(t *testing.T) {
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
+	defer func() {
+		if err := recover(); err != nil {
+			t.Error(err)
+		}
+	}()
 
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
