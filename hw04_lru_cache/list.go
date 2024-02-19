@@ -45,8 +45,7 @@ func (l *list) PushFront(v interface{}) *ListItem {
 	if l.length == 0 {
 		return l.pushFirst(i)
 	}
-	i.Next = l.head
-	l.head.Prev = i
+	i.Next, l.head.Prev = l.head, i
 	l.head = i
 	l.length++
 	return i
@@ -57,43 +56,58 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	if l.length == 0 {
 		return l.pushFirst(i)
 	}
-	i.Prev = l.tail
-	l.tail.Next = i
+	i.Prev, l.tail.Next = l.tail, i
 	l.tail = i
 	l.length++
 	return i
 }
 
+func (l *list) clear() {
+	l.head, l.tail = nil, nil
+	l.length = 0
+}
+
+func (l *list) removeHead() {
+	l.head.Next.Prev, l.head = nil, l.head.Next
+	l.length--
+}
+
+func (l *list) removeTail() {
+	l.tail.Prev.Next, l.tail = nil, l.tail.Prev
+	l.length--
+}
+
 func (l *list) Remove(i *ListItem) {
 	if l.length == 1 {
-		l.head = nil
-		l.tail = nil
-		l.length--
+		l.clear()
 		return
 	}
 	if l.head == i {
-		l.head.Next.Prev = nil
-		l.head = l.head.Next
-		l.length--
+		l.removeHead()
 		return
 	}
 	if l.tail == i {
-		l.tail.Prev.Next = nil
-		l.tail = l.tail.Prev
-		l.length--
+		l.removeTail()
 		return
 	}
-	prev, next := i.Prev, i.Next
-	prev.Next = next
-	next.Prev = prev
+	i.Prev.Next, i.Next.Prev = i.Next, i.Prev
 	l.length--
 }
+
 func (l *list) MoveToFront(i *ListItem) {
-	if l.length == 1 {
+	if l.length == 1 || l.head == i {
 		return
 	}
-	l.Remove(i)
-	l.PushFront(i.Value)
+	if l.tail == i {
+		tail := i.Prev
+		i.Next, l.head.Prev = l.head, i
+		i.Prev, tail.Next = nil, nil
+		l.head, l.tail = i, tail
+		return
+	}
+	i.Prev.Next, i.Next.Prev = i.Next, i.Prev
+	i.Prev, i.Next = nil, l.head
+	l.head.Prev, l.head = i, i
 }
 
 func NewList() List {
