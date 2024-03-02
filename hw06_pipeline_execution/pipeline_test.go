@@ -90,4 +90,23 @@ func TestPipeline(t *testing.T) {
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
 	})
+
+	t.Run("empty pipeline", func(t *testing.T) {
+		tests := []int{1, 2, 3, 4, 5}
+		results := make([]int, 0, len(tests))
+
+		in, done := make(Bi), make(Bi)
+		go func() {
+			defer close(in)
+			for _, v := range tests {
+				in <- v
+			}
+		}()
+
+		for v := range ExecutePipeline(in, done, []Stage{}...) {
+			results = append(results, v.(int))
+		}
+
+		require.Equal(t, results, tests)
+	})
 }
