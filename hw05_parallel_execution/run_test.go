@@ -89,3 +89,48 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+// Тест не работает: я ожидаю, что успешной будет проверка runtime.NumGoroutine() >= workersCount,
+// но запущены оказываются только 3 горутины. Вероятно это текущий поток, require.Eventually и Run.
+// Ниже будет пример теста, который дает верный результат. Вероятно я не учитываю чего-то.
+
+// TODO: вернуться к этому тесту позже.
+// func TestEventually(t *testing.T) {
+// 	tasksCount := 50
+// 	tasks := make([]Task, 0, tasksCount)
+
+// 	var runTasksCount int32
+
+// 	for i := 0; i < tasksCount; i++ {
+// 		tasks = append(tasks, func() error {
+// 			atomic.AddInt32(&runTasksCount, 1)
+// 			return nil
+// 		})
+// 	}
+
+// 	workersCount := 5
+// 	maxErrorsCount := 1
+
+// 	err := Run(tasks, workersCount, maxErrorsCount)
+// 	require.Eventually(t, func() bool {
+// 		return runtime.NumGoroutine() >= 3
+// 	}, time.Millisecond*500, time.Millisecond*50)
+// 	require.NoError(t, err)
+// 	require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+// }
+
+// func TestRequireEventually(t *testing.T) {
+// 	numWorkers := 5
+// 	wg := &sync.WaitGroup{}
+// 	wg.Add(numWorkers)
+
+// 	for i := 0; i < numWorkers; i++ {
+// 		go func() {
+// 			defer wg.Done()
+// 			time.Sleep(time.Millisecond * 500)
+// 		}()
+// 	}
+// 	require.Eventually(t, func() bool {
+// 		return runtime.NumGoroutine() >= numWorkers
+// 	}, time.Millisecond*500, time.Millisecond*50)
+// }
