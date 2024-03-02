@@ -67,4 +67,25 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("invalid workersCount", func(t *testing.T) {
+		err := Run([]Task{}, -1, 12)
+		require.Error(t, err)
+
+		err = Run([]Task{}, 0, 12)
+		require.Error(t, err)
+	})
+
+	t.Run("invalid maxErrorsCount", func(t *testing.T) {
+		err := Run([]Task{}, 1, -1)
+		require.Error(t, err)
+
+		err = Run([]Task{}, 1, 0)
+		require.Error(t, err)
+	})
+
+	t.Run("empty task array", func(t *testing.T) {
+		err := Run([]Task{}, 5, 1)
+		require.NoError(t, err)
+	})
 }

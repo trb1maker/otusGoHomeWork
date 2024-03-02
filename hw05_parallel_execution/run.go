@@ -33,7 +33,7 @@ func Run(tasks []Task, workersCount, maxErrorsCount int) error {
 	return err
 }
 
-// waitErrors запускает taskChannel и набор worker, возвращает канал ошибок
+// waitErrors запускает taskChannel и набор worker, возвращает канал ошибок.
 func waitErrors(ctx context.Context, tt []Task, workersCount int) <-chan error {
 	out := make(chan error)
 	wg := &sync.WaitGroup{}
@@ -51,7 +51,7 @@ func waitErrors(ctx context.Context, tt []Task, workersCount int) <-chan error {
 	return out
 }
 
-// taskChannel отправляет задачи в канал пока не получит сигнал завершить работу или пока вся работа не будет завершена
+// taskChannel отправляет задачи в канал пока не получит сигнал завершить работу или пока вся работа не будет завершена.
 func taskChannel(ctx context.Context, tt []Task, wg *sync.WaitGroup) <-chan Task {
 	out := make(chan Task)
 	go func() {
@@ -69,7 +69,7 @@ func taskChannel(ctx context.Context, tt []Task, wg *sync.WaitGroup) <-chan Task
 	return out
 }
 
-// worker получает задачи из канала и выполняет их, если не поступил сигнал завершить работу
+// worker получает задачи из канала и выполняет их, если не поступил сигнал завершить работу.
 func worker(ctx context.Context, tt <-chan Task, errs chan<- error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for t := range tt {
