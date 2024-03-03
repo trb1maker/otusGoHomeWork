@@ -10,6 +10,7 @@ import (
 var (
 	ErrUnsupportedFile       = errors.New("unsupported file")
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
+	ErrSourceIsDir           = errors.New("source is directory")
 )
 
 func Copy(from string, to string, offset int64, limit int64) error {
@@ -35,6 +36,9 @@ func copy(src file, dst io.Writer, offset int64, limit int64) error {
 	stat, err := src.Stat()
 	if err != nil {
 		return err
+	}
+	if stat.IsDir() {
+		return ErrSourceIsDir
 	}
 	// Ожидаемое поведение согласно заданию
 	if limit == 0 {
