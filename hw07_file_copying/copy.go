@@ -9,7 +9,7 @@ var (
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
 )
 
-func Copy(fromPath, toPath string, offset, limit int64) error {
+func Copy(cfg *config) error {
 	// Place your code here.
 	return nil
 }
