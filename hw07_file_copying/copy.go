@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"io"
+	"io/fs"
 	"os"
 )
 
@@ -17,7 +18,20 @@ func Copy(from string, to string, offset int64, limit int64) error {
 		return err
 	}
 	defer src.Close()
+	dst, err := os.Create(to)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	return copy(src, dst, offset, limit)
+}
 
+type file interface {
+	io.ReaderAt
+	Stat() (fs.FileInfo, error)
+}
+
+func copy(src file, dst io.Writer, offset int64, limit int64) error {
 	stat, err := src.Stat()
 	if err != nil {
 		return err
@@ -26,12 +40,6 @@ func Copy(from string, to string, offset int64, limit int64) error {
 	if limit == 0 {
 		limit = stat.Size()
 	}
-
-	dst, err := os.Create(to)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
 	return copyWithOffset(src, dst, offset, limit)
 }
 

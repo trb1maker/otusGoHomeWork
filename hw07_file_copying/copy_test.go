@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -38,6 +39,50 @@ func Test_copyWithOffset(t *testing.T) {
 				err := copyWithOffset(r, w, tt.offset, tt.limit)
 				require.NoError(t, err)
 				require.Equal(t, tt.want, w.String())
+			})
+		}
+	})
+}
+
+func readExprected(t *testing.T, fileName string) fmt.Stringer {
+	f, err := os.Open(fileName)
+	if err != nil {
+		t.Skip(err)
+	}
+	defer f.Close()
+	buf := bytes.NewBuffer(nil)
+	_, err = io.Copy(buf, f)
+	if err != nil {
+		t.Skip(err)
+	}
+	return buf
+}
+
+func Test_copy(t *testing.T) {
+	t.Run("стандартные тесты", func(t *testing.T) {
+		tests := []struct {
+			offset int64
+			limit  int64
+		}{
+			{0, 0},
+			{0, 10},
+			{0, 1000},
+			{0, 10000},
+			{100, 1000},
+			{6000, 10000},
+		}
+		for _, tt := range tests {
+			fileName := fmt.Sprintf("./testdata/out_offset%d_limit%d.txt", tt.offset, tt.limit)
+			t.Run(fileName, func(t *testing.T) {
+				f, err := os.Open("./testdata/input.txt")
+				if err != nil {
+					t.Skip(err)
+				}
+				defer f.Close()
+				buf := bytes.NewBuffer(nil)
+				err = copy(f, buf, tt.offset, tt.limit)
+				require.NoError(t, err)
+				require.Equal(t, readExprected(t, fileName).String(), buf.String())
 			})
 		}
 	})
