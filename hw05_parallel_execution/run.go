@@ -40,13 +40,11 @@ func waitErrors(ctx context.Context, tt []Task, workersCount int) <-chan error {
 	wg.Add(workersCount + 1)
 	go func() {
 		defer close(out)
-		wg.Wait()
-	}()
-	go func() {
 		tasks := taskChannel(ctx, tt, wg)
 		for i := 0; i < workersCount; i++ {
 			go worker(ctx, tasks, out, wg)
 		}
+		wg.Wait()
 	}()
 	return out
 }
