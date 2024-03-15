@@ -8,7 +8,25 @@ type (
 
 type Stage func(in In) (out Out)
 
+func limitter(in In, done In) Out {
+	out := make(Bi)
+	go func() {
+		defer close(out)
+		for v := range in {
+			select {
+			case <-done:
+				return
+			default:
+				out <- v
+			}
+		}
+	}()
+	return out
+}
+
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	// Place your code here.
-	return nil
+	for _, stage := range stages {
+		in = stage(limitter(in, done))
+	}
+	return in
 }
