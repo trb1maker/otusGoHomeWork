@@ -13,4 +13,5 @@ func main() {
 	flag.Int64Var(&offset, "offset", 0, "offset in input file")
 	flag.Int64Var(&limit, "limit", 0, "limit of bytes to copy")
 	flag.Parse()
+	Copy(from, to, offset, limit)
 }
