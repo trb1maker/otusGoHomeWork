@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 var (
@@ -42,7 +44,8 @@ func Copy(from string, to string, offset int64, limit int64) error {
 }
 
 func copyWithOffset(r io.ReaderAt, w io.Writer, offset int64, limit int64) error {
+	pb := progressbar.DefaultBytes(limit)
 	r = io.NewSectionReader(r, offset, limit)
-	_, err := io.Copy(w, r.(io.Reader))
+	_, err := io.Copy(io.MultiWriter(w, pb), r.(io.Reader))
 	return err
 }
