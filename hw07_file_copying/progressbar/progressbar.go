@@ -16,7 +16,7 @@ type ProgressBar struct {
 func printProgress(percent int64) string {
 	return fmt.Sprintf(
 		"\r[%s%s] %d%%",
-		strings.Repeat("|", int(percent)),
+		strings.Repeat("X", int(percent)),
 		strings.Repeat(" ", 100-int(percent)),
 		percent)
 }
