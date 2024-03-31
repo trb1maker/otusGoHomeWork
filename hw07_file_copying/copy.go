@@ -12,27 +12,39 @@ var (
 	ErrUnsupportedFile       = errors.New("unsupported file")
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
 	ErrSourceIsDir           = errors.New("source is directory")
+	ErrLimitIsNegative       = errors.New("limit is negative")
+	ErrOffsetIsNegative      = errors.New("offset is negative")
 )
 
 func Copy(from string, to string, offset int64, limit int64) error {
+	if offset < 0 {
+		return ErrOffsetIsNegative
+	}
+	if limit < 0 {
+		return ErrLimitIsNegative
+	}
+
 	src, err := os.Open(from)
 	if err != nil {
 		return err
 	}
 	defer src.Close()
 
-	// Проверяю, что это файл, а не директория
 	stat, err := src.Stat()
 	if err != nil {
 		return err
 	}
+
 	if stat.IsDir() {
 		return ErrSourceIsDir
 	}
 
-	// Ожидаемое поведение согласно заданию
-	if limit == 0 {
-		limit = stat.Size()
+	if offset > stat.Size() {
+		return ErrOffsetExceedsFileSize
+	}
+
+	if limit == 0 || limit > stat.Size()-offset {
+		limit = stat.Size() - offset
 	}
 
 	dst, err := os.Create(to)
@@ -40,6 +52,7 @@ func Copy(from string, to string, offset int64, limit int64) error {
 		return err
 	}
 	defer dst.Close()
+
 	return copyWithOffset(src, dst, offset, limit)
 }
 
