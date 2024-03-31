@@ -8,9 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	rx = regexp.MustCompile(`\[X{10}\s{90}\]\s10%`) // 10% progress
-)
+var rx = regexp.MustCompile(`\[X{10}\s{90}\]\s10%`) // 10% progress
 
 func TestPrintProgress(t *testing.T) {
 	printed := printProgress(10)
