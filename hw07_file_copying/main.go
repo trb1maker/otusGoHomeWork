@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log/slog"
+	"log"
 )
 
 var useMyProgressBar bool
@@ -21,6 +21,6 @@ func main() {
 	flag.Parse()
 
 	if err := Copy(from, to, offset, limit); err != nil {
-		slog.Error("Copy", err)
+		log.Println(err)
 	}
 }
