@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	rx = regexp.MustCompile(`\[X{10}\s{90}\]\s10%`)
+	rx = regexp.MustCompile(`\[X{10}\s{90}\]\s10%`) // 10% progress
 )
 
 func TestPrintProgress(t *testing.T) {
