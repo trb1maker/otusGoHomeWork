@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/schollz/progressbar/v3"
+	myProgressBar "github.com/trb1maker/otus_golang_home_work/hw07_file_copying/progressbar"
 )
 
 var (
@@ -57,7 +58,12 @@ func Copy(from string, to string, offset int64, limit int64) error {
 }
 
 func copyWithOffset(r io.ReaderAt, w io.Writer, offset int64, limit int64) error {
-	pb := progressbar.DefaultBytes(limit)
+	var pb io.Writer
+	if useMyProgressBar {
+		pb = myProgressBar.NewProgressBar(limit)
+	} else {
+		pb = progressbar.DefaultBytes(limit)
+	}
 	r = io.NewSectionReader(r, offset, limit)
 	_, err := io.Copy(io.MultiWriter(w, pb), r.(io.Reader))
 	return err
