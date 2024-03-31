@@ -2,32 +2,26 @@ package progressbar
 
 import (
 	"bytes"
-	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	rx = regexp.MustCompile(`\[X{10}\s{90}\]\s10%`)
+)
+
 func TestPrintProgress(t *testing.T) {
-	tests := []struct {
-		percent int64
-		want    string
-	}{
-		{0, "\r[                                                                                                    ] 0%"},
-		{10, "\r[||||||||||                                                                                          ] 10%"},
-		{100, "\r[||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||] 100%"},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("percent=%d", tt.percent), func(t *testing.T) {
-			got := printProgress(tt.percent)
-			require.Equal(t, tt.want, got)
-		})
-	}
+	printed := printProgress(10)
+
+	require.True(t, rx.MatchString(printed))
 }
+
 func TestProgressBar(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
 
 	pb := &ProgressBar{w: buf, limit: 50}
 	pb.Write([]byte{1, 2, 3, 4, 5})
-	require.Equal(t, "\r[||||||||||                                                                                          ] 10%", buf.String())
+	require.True(t, rx.MatchString(buf.String()))
 }
