@@ -148,4 +148,21 @@ func TestCopy(t *testing.T) {
 			require.Error(t, err)
 		})
 	})
+
+	t.Run("equal files", func(t *testing.T) {
+		f1, err := os.Open("testdata/input.txt")
+		require.NoError(t, err)
+		defer f1.Close()
+
+		s1, err := f1.Stat()
+		require.NoError(t, err)
+
+		f2, err := os.Open("testdata/input.txt")
+		require.NoError(t, err)
+
+		s2, err := f2.Stat()
+		require.NoError(t, err)
+
+		require.True(t, os.SameFile(s1, s2))
+	})
 }

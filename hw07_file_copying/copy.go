@@ -13,6 +13,8 @@ var (
 	ErrUnsupportedFile       = errors.New("unsupported file")
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
 	ErrSourceIsDir           = errors.New("source is directory")
+	ErrDestinationIsDir      = errors.New("destination is directory")
+	ErrEqualFiles            = errors.New("files are equal")
 	ErrLimitIsNegative       = errors.New("limit is negative")
 	ErrOffsetIsNegative      = errors.New("offset is negative")
 )
@@ -31,21 +33,21 @@ func Copy(from string, to string, offset int64, limit int64) error {
 	}
 	defer src.Close()
 
-	stat, err := src.Stat()
+	srcStat, err := src.Stat()
 	if err != nil {
 		return err
 	}
 
-	if stat.IsDir() {
+	if srcStat.IsDir() {
 		return ErrSourceIsDir
 	}
 
-	if offset > stat.Size() {
+	if offset > srcStat.Size() {
 		return ErrOffsetExceedsFileSize
 	}
 
-	if limit == 0 || limit > stat.Size()-offset {
-		limit = stat.Size() - offset
+	if limit == 0 || limit > srcStat.Size()-offset {
+		limit = srcStat.Size() - offset
 	}
 
 	dst, err := os.Create(to)
@@ -53,6 +55,21 @@ func Copy(from string, to string, offset int64, limit int64) error {
 		return err
 	}
 	defer dst.Close()
+
+	dstStat, err := dst.Stat()
+	if err != nil {
+		return err
+	}
+
+	// Добавил проверку на то, что destination является директорией
+	if dstStat.IsDir() {
+		return ErrDestinationIsDir
+	}
+
+	// Добавил проверку эквивалентности файлов
+	if os.SameFile(srcStat, dstStat) {
+		return ErrEqualFiles
+	}
 
 	return copyWithOffset(src, dst, offset, limit)
 }
