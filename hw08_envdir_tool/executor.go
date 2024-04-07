@@ -1,7 +1,32 @@
 package main
 
+import (
+	"io"
+	"log/slog"
+	"os"
+	"os/exec"
+)
+
 // RunCmd runs a command + arguments (cmd) with environment variables from env.
 func RunCmd(cmd []string, env Environment) (returnCode int) {
-	// Place your code here.
-	return
+	return runCmd(cmd, env, os.Stdout, os.Stderr)
+}
+
+func runCmd(cmd []string, env Environment, output io.Writer, errors io.Writer) (returnCode int) {
+	envs := os.Environ()
+	for name, value := range env {
+		envs = append(envs, name+"="+value.Value)
+	}
+	app := &exec.Cmd{
+		Path:   cmd[0],
+		Args:   cmd,
+		Env:    envs,
+		Stdin:  os.Stdin,
+		Stdout: output,
+		Stderr: errors,
+	}
+	if err := app.Run(); err != nil {
+		slog.Error("failed to run command", err)
+	}
+	return app.ProcessState.ExitCode()
 }
