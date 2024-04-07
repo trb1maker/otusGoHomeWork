@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log/slog"
+	"log"
 	"os"
 )
 
@@ -11,7 +11,7 @@ func main() {
 
 	env, err := ReadDir(envDir)
 	if err != nil {
-		slog.Error("failed to read env", err)
+		log.Printf("failed to read env: %v", err)
 		return
 	}
 

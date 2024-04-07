@@ -2,7 +2,7 @@ package main
 
 import (
 	"io"
-	"log/slog"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -26,7 +26,7 @@ func runCmd(cmd []string, env Environment, output io.Writer, errors io.Writer) (
 		Stderr: errors,
 	}
 	if err := app.Run(); err != nil {
-		slog.Error("failed to run command", err)
+		log.Printf("failed to run command: %v", err)
 	}
 	return app.ProcessState.ExitCode()
 }
