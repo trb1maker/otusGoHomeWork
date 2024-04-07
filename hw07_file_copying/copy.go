@@ -27,17 +27,12 @@ func Copy(from string, to string, offset int64, limit int64) error {
 		return ErrLimitIsNegative
 	}
 
-	src, err := os.Open(from)
+	// До открытия файла проверяю, что файл не является директорией
+	// Настраиваю limit в зависимости от размера исходного файла
+	srcStat, err := os.Stat(from)
 	if err != nil {
 		return err
 	}
-	defer src.Close()
-
-	srcStat, err := src.Stat()
-	if err != nil {
-		return err
-	}
-
 	if srcStat.IsDir() {
 		return ErrSourceIsDir
 	}
@@ -50,26 +45,34 @@ func Copy(from string, to string, offset int64, limit int64) error {
 		limit = srcStat.Size() - offset
 	}
 
+	src, err := os.Open(from)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	// До открытия / создания файла проверяю, что файл не является директорией
+	// и src и dst не ссылаются на один и тот же файл
+	dstStat, err := os.Stat(to)
+	if err == nil {
+		if dstStat.IsDir() {
+			return ErrDestinationIsDir
+		}
+		if os.SameFile(srcStat, dstStat) {
+			return ErrEqualFiles
+		}
+	} else if os.IsExist(err) {
+		// Если при проверке файла возникла ошибка, значит, dst либо не существует,
+		// либо есть какие-то другие проблемы с доступом к нему. В первом случае
+		// создаю файл, во втором - возвращаю ошибку
+		return err
+	}
+
 	dst, err := os.Create(to)
 	if err != nil {
 		return err
 	}
 	defer dst.Close()
-
-	dstStat, err := dst.Stat()
-	if err != nil {
-		return err
-	}
-
-	// Добавил проверку на то, что destination является директорией
-	if dstStat.IsDir() {
-		return ErrDestinationIsDir
-	}
-
-	// Добавил проверку эквивалентности файлов
-	if os.SameFile(srcStat, dstStat) {
-		return ErrEqualFiles
-	}
 
 	return copyWithOffset(src, dst, offset, limit)
 }

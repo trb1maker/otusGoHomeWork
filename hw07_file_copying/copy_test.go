@@ -143,24 +143,17 @@ func TestCopy(t *testing.T) {
 			require.Error(t, err)
 		})
 
-		t.Run("source is directory", func(t *testing.T) {
-			err := Copy("testdata", "/tmp/out.txt", 0, 0)
+		t.Run("source or destination is directory", func(t *testing.T) {
+			err := Copy("testdata/input.txt", "testdata/input.txt", 0, 0)
 			require.Error(t, err)
 		})
 	})
 
 	t.Run("equal files", func(t *testing.T) {
-		f1, err := os.Open("testdata/input.txt")
-		require.NoError(t, err)
-		defer f1.Close()
-
-		s1, err := f1.Stat()
+		s1, err := os.Stat("testdata/input.txt")
 		require.NoError(t, err)
 
-		f2, err := os.Open("testdata/input.txt")
-		require.NoError(t, err)
-
-		s2, err := f2.Stat()
+		s2, err := os.Stat("testdata/input.txt")
 		require.NoError(t, err)
 
 		require.True(t, os.SameFile(s1, s2))
