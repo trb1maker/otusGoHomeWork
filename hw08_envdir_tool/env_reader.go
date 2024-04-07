@@ -24,7 +24,6 @@ func ReadDir(dir string) (Environment, error) {
 	env := make(Environment)
 
 	for _, file := range files {
-
 		// имя переменной не должно содержать символа "="
 		if strings.Contains(file.Name(), "=") {
 			continue
