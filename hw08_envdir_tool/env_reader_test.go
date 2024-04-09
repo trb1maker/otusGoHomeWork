@@ -1,30 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestReadEnvFromBytes(t *testing.T) {
-	t.Run("первая строка в файле - это значение переменной", func(t *testing.T) {
-		tests := []struct {
-			name  string
-			input []byte
-			want  string
-		}{
-			{"одна строка", []byte("test"), "test"},
-			{"несколько строк", []byte("test1\ntest2"), "test1"},
-		}
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				got, err := readEnvFromBytes(tt.input)
-				require.NoError(t, err)
-				require.Equal(t, tt.want, got.Value)
-			})
-		}
-	})
-
 	t.Run("пробелы и символы табуляции в конце значения переменной должны быть удалены", func(t *testing.T) {
 		tests := []struct {
 			name  string
@@ -59,13 +43,29 @@ func TestReadEnvFromBytes(t *testing.T) {
 			})
 		}
 	})
+}
 
-	t.Run("комплексный тест", func(t *testing.T) {
-		test := []byte("a\000b \t\nc")
-		got, err := readEnvFromBytes(test)
+func TestReadEnvFromFile(t *testing.T) {
+	f := bytes.NewBufferString("test\ntest1")
+
+	buf := make([]byte, 30, 120)
+	offset := 0
+
+	for {
+		n, err := f.Read(buf)
+		if err == io.EOF {
+			buf = buf[:offset]
+			break
+		}
 		require.NoError(t, err)
-		require.Equal(t, "a\nb", got.Value)
-	})
+
+		if i := bytes.IndexByte(buf[:offset+n], '\n'); i >= 0 {
+			buf = buf[:offset+i]
+			break
+		}
+		offset += n
+	}
+	require.Equal(t, "test", string(buf))
 }
 
 func TestReadDir(t *testing.T) {

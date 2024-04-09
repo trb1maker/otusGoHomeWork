@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"strings"
 )
@@ -50,19 +51,33 @@ func ReadDir(dir string) (Environment, error) {
 }
 
 func readEnvFromFile(name string) (EnvValue, error) {
-	data, err := os.ReadFile(name)
+	f, err := os.Open(name)
 	if err != nil {
 		return EnvValue{}, err
 	}
-	return readEnvFromBytes(data)
+	defer f.Close()
+	buf := make([]byte, 30, 120)
+	offset := 0
+
+	for {
+		n, err := f.Read(buf)
+		if err == io.EOF {
+			return readEnvFromBytes(buf[:offset])
+		}
+		if err != nil {
+			return EnvValue{}, err
+		}
+
+		if i := bytes.IndexByte(buf[:offset+n], '\n'); i >= 0 {
+			return readEnvFromBytes(buf[:offset+i])
+		}
+		offset += n
+	}
 }
 
 func readEnvFromBytes(data []byte) (EnvValue, error) {
-	// первая строка в файле - это значение переменной
-	data = bytes.Split(data, []byte{'\n'})[0]
-
 	// пробелы и символы табуляции в конце значения переменной должны быть удалены
-	data = bytes.TrimRight(data, " \t\n")
+	data = bytes.TrimRight(data, " \t")
 
 	// терминальные нули должны быть трансформированы в символ перевода строки
 	data = bytes.ReplaceAll(data, []byte{0}, []byte{'\n'})

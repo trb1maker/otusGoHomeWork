@@ -13,6 +13,14 @@ func RunCmd(cmd []string, env Environment) (returnCode int) {
 }
 
 func runCmd(cmd []string, env Environment, output io.Writer, errors io.Writer) (returnCode int) {
+	for name, value := range env {
+		if value.NeedRemove {
+			os.Unsetenv(name)
+		}
+		// По идее здесь бы добавить переменные в окружение, то тогда нет смысла
+		// передавать их в командную RunCmd в качестве аргумента.
+	}
+
 	envs := os.Environ()
 	for name, value := range env {
 		envs = append(envs, name+"="+value.Value)
