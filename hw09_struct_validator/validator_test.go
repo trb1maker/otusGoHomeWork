@@ -2,8 +2,10 @@ package hw09structvalidator
 
 import (
 	"encoding/json"
-	"fmt"
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 type UserRole string
@@ -14,7 +16,7 @@ type (
 		ID     string `json:"id" validate:"len:36"`
 		Name   string
 		Age    int             `validate:"min:18|max:50"`
-		Email  string          `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
+		Email  string          `validate:"regexp:^[\\w\\d._-]+@\\w+\\.\\w+$"`
 		Role   UserRole        `validate:"in:admin,stuff"`
 		Phones []string        `validate:"len:11"`
 		meta   json.RawMessage //nolint:unused
@@ -37,24 +39,31 @@ type (
 )
 
 func TestValidate(t *testing.T) {
-	tests := []struct {
-		in          interface{}
-		expectedErr error
-	}{
-		{
-			// Place your code here.
-		},
-		// ...
-		// Place your code here.
-	}
-
-	for i, tt := range tests {
-		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
-			tt := tt
-			t.Parallel()
-
-			// Place your code here.
-			_ = tt
-		})
-	}
+	t.Run("valid users", func(t *testing.T) {
+		f, err := os.Open("testdata/users.json")
+		if err != nil {
+			t.Skip(err)
+		}
+		defer f.Close()
+		users := make([]User, 0, 25)
+		if err := json.NewDecoder(f).Decode(&users); err != nil {
+			t.Skip(err)
+		}
+		for _, u := range users {
+			t.Run(u.ID, func(t *testing.T) {
+				require.NoError(t, Validate(u))
+			})
+		}
+	})
+	t.Run("invalid users", func(t *testing.T) {
+		u := User{
+			ID:     "123",
+			Name:   "John",
+			Age:    32,
+			Email:  "john@hw.ru",
+			Role:   "admin",
+			Phones: []string{"12345678901"},
+		}
+		require.Error(t, Validate(u))
+	})
 }
