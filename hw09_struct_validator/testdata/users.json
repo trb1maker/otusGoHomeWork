@@ -1,0 +1,220 @@
+[
+    {
+        "id": "0ba1ccb1-738c-4a44-bf58-1d64955f791b",
+        "name": "Владимиров Константин Данилович",
+        "age": 21,
+        "email": "mokuko-xiye13@yahoo.com",
+        "role": "stuff",
+        "phones": [
+            "13204156851"
+        ]
+    },
+    {
+        "id": "2e99fa54-7918-4300-8141-97a85f3fd6e6",
+        "name": "Жукова Серафима Кирилловна",
+        "age": 36,
+        "email": "xuhay-upogo76@mail.ru",
+        "role": "admin",
+        "phones": [
+            "13204156851",
+            "40610526907"
+        ]
+    },
+    {
+        "id": "ffdd43f8-5644-4591-9f2d-4fab7040de3b",
+        "name": "Фролова Василиса Владиславовна",
+        "age": 46,
+        "email": "jepu-goluya28@gmail.com",
+        "role": "admin",
+        "phones": [
+            "35436688163"
+        ]
+    },
+    {
+        "id": "239633b3-d647-4f87-9604-b7011d005ee7",
+        "name": "Носова Вероника Романовна",
+        "age": 38,
+        "email": "zoj_ijeniso70@mail.ru",
+        "role": "stuff",
+        "phones": [
+            "13204156851",
+            "40610526907"
+        ]
+    },
+    {
+        "id": "1881d3e9-a82a-441d-a3c2-ea49e2e76371",
+        "name": "Ефимов Лев Алексеевич",
+        "age": 38,
+        "email": "vehil_ocire40@yandex.ru",
+        "role": "admin",
+        "phones": [
+            "63968876322",
+            "25476387128",
+            "38864491284"
+        ]
+    },
+    {
+        "id": "f8a86a6d-1c97-4058-bd21-cc214e1d605a",
+        "name": "Иванов Михаил Игоревич",
+        "age": 48,
+        "email": "cel_itinoyi12@aol.com",
+        "role": "stuff",
+        "phones": [
+            "13825588179"
+        ]
+    },
+    {
+        "id": "a181237d-13b9-4b9e-861c-8e67bfead0d6",
+        "name": "Романов Лев Маркович",
+        "age": 29,
+        "email": "tonom-eliju14@bk.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "9f0ea4c3-345e-453b-84d1-a646cb85a739",
+        "name": "Родин Алексей Александрович",
+        "age": 22,
+        "email": "bijuki-piku57@yahoo.com",
+        "role": "admin",
+        "phones": [
+            "65425382628"
+        ]
+    },
+    {
+        "id": "59273450-19c1-4229-ab67-73311f8c31d2",
+        "name": "Голикова Злата Ивановна",
+        "age": 20,
+        "email": "zeyeru-yipu98@inbox.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "d9b6df05-2954-4599-aaee-074a13fbed61",
+        "name": "Терентьев Мирослав Степанович",
+        "age": 43,
+        "email": "hat_ohefovi29@bk.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "d23408ac-908b-49a6-aa1a-52991c898392",
+        "name": "Ильина Каролина Матвеевна",
+        "age": 48,
+        "email": "zisuwa_ciru21@internet.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "dc046b7b-1015-4d14-af8c-25e980250559",
+        "name": "Иванова Ксения Тимофеевна",
+        "age": 37,
+        "email": "bebah-uvonu29@yahoo.com",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "4425dfb4-e77f-4e62-95ff-f718f006a60a",
+        "name": "Винокуров Артём Александрович",
+        "age": 46,
+        "email": "giror-ihepe88@hotmail.com",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "b06b9d92-0021-4e3f-a136-bed93da79c1c",
+        "name": "Климова Виктория Петровна",
+        "age": 49,
+        "email": "yenor_ujivi56@list.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "23d47ae9-c760-4181-bbe6-194f51ade48a",
+        "name": "Абрамова Екатерина Михайловна",
+        "age": 28,
+        "email": "legali_sede33@bk.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "ad326807-78e8-4851-9e10-2efc815785fe",
+        "name": "Кузнецова София Ярославовна",
+        "age": 46,
+        "email": "sicux_exoka29@yandex.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "9229e870-8efc-40fe-bca9-bef535f48ea5",
+        "name": "Соколова Ксения Ярославовна",
+        "age": 25,
+        "email": "wuv-olosoma82@yandex.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "8cfd2351-cbb2-42bc-834d-9271c55bb547",
+        "name": "Горшкова Вера Богдановна",
+        "age": 20,
+        "email": "funa_kicaxu99@internet.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "f7bf971d-d9f4-4c93-a779-6c5a06338d33",
+        "name": "Макарова Ксения Саввична",
+        "age": 47,
+        "email": "von-iwisibi49@list.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "fadfebd2-e26e-4f14-aeaa-1cc70cbcfdc1",
+        "name": "Абрамов Иван Ярославович",
+        "age": 46,
+        "email": "hoporid_apu63@inbox.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "2a3367c9-211f-4a2d-9c5c-10a56592649d",
+        "name": "Петрова Екатерина Артёмовна",
+        "age": 27,
+        "email": "rix-esemose80@bk.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "2a8ce6f9-82c0-4b4e-b8b2-9c2a76039c5b",
+        "name": "Рыбакова Анна Артёмовна",
+        "age": 30,
+        "email": "cirux_ofane17@inbox.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "a98ac1e9-47db-4152-bf11-6352f6753332",
+        "name": "Иванов Даниил Саввич",
+        "age": 39,
+        "email": "mun_uyohana15@mail.ru",
+        "role": "admin",
+        "phones": []
+    },
+    {
+        "id": "d5f23e42-68d6-4ba3-9bbc-3fbfabd26d90",
+        "name": "Беляева Полина Павловна",
+        "age": 27,
+        "email": "zey-imebite93@internet.ru",
+        "role": "stuff",
+        "phones": []
+    },
+    {
+        "id": "519866d6-c3c3-4c61-9a23-1fea6a1bd7f3",
+        "name": "Игнатьева Алиса Сергеевна",
+        "age": 35,
+        "email": "lese_putiyo63@hotmail.com",
+        "role": "admin",
+        "phones": []
+    }
+]
