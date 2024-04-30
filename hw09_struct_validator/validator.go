@@ -66,46 +66,49 @@ func validateStruct(v reflect.Value) error {
 	return validationErrors
 }
 
+//nolint:gocognit
 func validateField(field reflect.Value, fieldName, fieldTag string) error {
+	//nolint:exhaustive
 	switch field.Kind() {
 	case reflect.String:
-		val, err := rules.NewStringRule(fieldTag)
+		rule, err := rules.NewStringRule(fieldTag)
 		if err != nil {
 			return err
 		}
-		if err := val.Validate(field.String()); err != nil {
+		if err := rule.Validate(field.String()); err != nil {
 			return &ValidationError{fieldName, err}
 		}
 	case reflect.Int:
-		val, err := rules.NewIntRule(fieldTag)
+		rule, err := rules.NewIntRule(fieldTag)
 		if err != nil {
 			return err
 		}
-		if err := val.Validate(int(field.Int())); err != nil {
+		if err := rule.Validate(int(field.Int())); err != nil {
 			return &ValidationError{fieldName, err}
 		}
 	case reflect.Slice:
 		if field.Len() == 0 {
 			return nil
 		}
+		//nolint:exhaustive
 		switch field.Index(0).Kind() {
 		case reflect.String:
-			val, err := rules.NewStringRule(fieldTag)
+			rule, err := rules.NewStringRule(fieldTag)
 			if err != nil {
 				return err
 			}
 			for i := 0; i < field.Len(); i++ {
-				if err := val.Validate(field.Index(i).String()); err != nil {
+				if err := rule.Validate(field.Index(i).String()); err != nil {
 					return &ValidationError{fieldName, err}
 				}
 			}
 		case reflect.Int:
-			val, err := rules.NewIntRule(fieldTag)
+			rule, err := rules.NewIntRule(fieldTag)
 			if err != nil {
 				return err
 			}
 			for i := 0; i < field.Len(); i++ {
-				if err := val.Validate(int(field.Index(i).Int())); err != nil {
+				if err := rule.Validate(int(field.Index(i).Int())); err != nil {
 					return &ValidationError{fieldName, err}
 				}
 			}
