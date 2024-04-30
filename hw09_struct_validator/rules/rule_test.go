@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	//nolint:goanalysis_metalinter
 	"github.com/trb1maker/otus_golang_home_work/hw09_struct_validator/rules"
 )
 
