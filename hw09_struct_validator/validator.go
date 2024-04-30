@@ -4,9 +4,6 @@ import (
 	"errors"
 	"reflect"
 	"strings"
-
-	//nolint:goanalysis_metalinter
-	"github.com/trb1maker/otus_golang_home_work/hw09_struct_validator/rules"
 )
 
 const tagName = "validate"
@@ -72,7 +69,7 @@ func validateField(field reflect.Value, fieldName, fieldTag string) error {
 	//nolint:exhaustive
 	switch field.Kind() {
 	case reflect.String:
-		rule, err := rules.NewStringRule(fieldTag)
+		rule, err := NewStringRule(fieldTag)
 		if err != nil {
 			return err
 		}
@@ -80,7 +77,7 @@ func validateField(field reflect.Value, fieldName, fieldTag string) error {
 			return &ValidationError{fieldName, err}
 		}
 	case reflect.Int:
-		rule, err := rules.NewIntRule(fieldTag)
+		rule, err := NewIntRule(fieldTag)
 		if err != nil {
 			return err
 		}
@@ -94,7 +91,7 @@ func validateField(field reflect.Value, fieldName, fieldTag string) error {
 		//nolint:exhaustive
 		switch field.Index(0).Kind() {
 		case reflect.String:
-			rule, err := rules.NewStringRule(fieldTag)
+			rule, err := NewStringRule(fieldTag)
 			if err != nil {
 				return err
 			}
@@ -104,7 +101,7 @@ func validateField(field reflect.Value, fieldName, fieldTag string) error {
 				}
 			}
 		case reflect.Int:
-			rule, err := rules.NewIntRule(fieldTag)
+			rule, err := NewIntRule(fieldTag)
 			if err != nil {
 				return err
 			}

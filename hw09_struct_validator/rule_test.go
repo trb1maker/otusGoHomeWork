@@ -1,12 +1,9 @@
-package rules_test
+package hw09structvalidator
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	//nolint:goanalysis_metalinter
-	"github.com/trb1maker/otus_golang_home_work/hw09_struct_validator/rules"
 )
 
 func TestString(t *testing.T) {
@@ -22,7 +19,7 @@ func TestString(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewStringRule(tt.tag)
+				r, err := NewStringRule(tt.tag)
 				require.NoError(t, err)
 				require.NoError(t, r.Validate(tt.value))
 			})
@@ -35,13 +32,13 @@ func TestString(t *testing.T) {
 			value string
 			err   error
 		}{
-			{"len", "len:5", "123456", rules.ErrLen},
-			{"regex", "regexp:^\\d{5}$", "123456", rules.ErrRegexp},
-			{"enum", "in:1,2,3", "4", rules.ErrEnum},
+			{"len", "len:5", "123456", ErrLen},
+			{"regex", "regexp:^\\d{5}$", "123456", ErrRegexp},
+			{"enum", "in:1,2,3", "4", ErrEnum},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewStringRule(tt.tag)
+				r, err := NewStringRule(tt.tag)
 				require.NoError(t, err)
 				require.ErrorIs(t, r.Validate(tt.value), tt.err)
 			})
@@ -58,23 +55,23 @@ func TestString(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewStringRule(tt.tag)
-				require.ErrorIs(t, err, rules.ErrNotValidTag)
+				r, err := NewStringRule(tt.tag)
+				require.ErrorIs(t, err, ErrNotValidTag)
 				require.Nil(t, r)
 			})
 		}
 	})
 	t.Run("structed tag", func(t *testing.T) {
 		tag := "len:1|regexp:^\\d$|in:1,2,3"
-		r, err := rules.NewStringRule(tag)
+		r, err := NewStringRule(tag)
 		require.NoError(t, err)
 		require.NoError(t, r.Validate("1"))
 	})
 	t.Run("structed tag with error", func(t *testing.T) {
 		tag := "len:1|regexp:^\\d$|in:1,2,3"
-		r, err := rules.NewStringRule(tag)
+		r, err := NewStringRule(tag)
 		require.NoError(t, err)
-		require.ErrorIs(t, r.Validate("4"), rules.ErrEnum)
+		require.ErrorIs(t, r.Validate("4"), ErrEnum)
 	})
 }
 
@@ -91,7 +88,7 @@ func TestInt(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewIntRule(tt.tag)
+				r, err := NewIntRule(tt.tag)
 				require.NoError(t, err)
 				require.NoError(t, r.Validate(tt.value))
 			})
@@ -104,13 +101,13 @@ func TestInt(t *testing.T) {
 			value int
 			err   error
 		}{
-			{"min", "min:10", 9, rules.ErrMin},
-			{"max", "max:10", 11, rules.ErrMax},
-			{"enum", "in:1,2,3", 4, rules.ErrEnum},
+			{"min", "min:10", 9, ErrMin},
+			{"max", "max:10", 11, ErrMax},
+			{"enum", "in:1,2,3", 4, ErrEnum},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewIntRule(tt.tag)
+				r, err := NewIntRule(tt.tag)
 				require.NoError(t, err)
 				require.ErrorIs(t, r.Validate(tt.value), tt.err)
 			})
@@ -127,22 +124,22 @@ func TestInt(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				r, err := rules.NewIntRule(tt.tag)
-				require.ErrorIs(t, err, rules.ErrNotValidTag)
+				r, err := NewIntRule(tt.tag)
+				require.ErrorIs(t, err, ErrNotValidTag)
 				require.Nil(t, r)
 			})
 		}
 	})
 	t.Run("structed tag", func(t *testing.T) {
 		tag := "min:1|max:10|in:1,2,3"
-		r, err := rules.NewIntRule(tag)
+		r, err := NewIntRule(tag)
 		require.NoError(t, err)
 		require.NoError(t, r.Validate(1))
 	})
 	t.Run("structed tag with error", func(t *testing.T) {
 		tag := "min:1max:10|in:1,2,3"
-		r, err := rules.NewIntRule(tag)
-		require.ErrorIs(t, err, rules.ErrNotValidTag)
+		r, err := NewIntRule(tag)
+		require.ErrorIs(t, err, ErrNotValidTag)
 		require.Nil(t, r)
 	})
 }

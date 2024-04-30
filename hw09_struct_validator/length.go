@@ -1,4 +1,4 @@
-package rules
+package hw09structvalidator
 
 import (
 	"errors"

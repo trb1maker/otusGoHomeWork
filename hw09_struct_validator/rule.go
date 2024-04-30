@@ -1,4 +1,4 @@
-package rules
+package hw09structvalidator
 
 import (
 	"errors"
@@ -30,6 +30,7 @@ func (p pipe[T]) Validate(v T) error {
 	return nil
 }
 
+//nolint:dupl
 func NewIntRule(s string) (Rule[int], error) {
 	elms := strings.Split(s, "|")
 	if len(elms) == 0 {
@@ -67,6 +68,7 @@ func NewIntRule(s string) (Rule[int], error) {
 	return p, nil
 }
 
+//nolint:dupl
 func NewStringRule(s string) (Rule[string], error) {
 	elms := strings.Split(s, "|")
 	if len(elms) == 0 {
