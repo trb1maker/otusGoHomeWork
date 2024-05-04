@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net"
 	"sync"
@@ -15,6 +16,16 @@ func TestInterface(t *testing.T) {
 	var c interface{} = &client{}
 	_, ok := c.(TelnetClient)
 	require.True(t, ok)
+}
+
+func TestErrCollection(t *testing.T) {
+	var (
+		errFirst  = errors.New("first")
+		errSecond = errors.New("second")
+	)
+	err := joinErrs(nil, errFirst, nil, errSecond, nil)
+	require.ErrorIs(t, err, errFirst)
+	require.ErrorIs(t, err, errSecond)
 }
 
 func TestTelnetClient(t *testing.T) {
