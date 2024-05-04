@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"log/slog"
+	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -13,7 +13,7 @@ import (
 
 func main() {
 	// Конфигурирую логгер
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	l := log.New(os.Stderr, "go-telnet", log.Ltime)
 
 	// Парсинг аргументов командной строки и валидация необходимых аргументов
 	var timeout time.Duration
@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) != 2 {
-		slog.Error("flag", "err", "not set address and port", "args", flag.Args())
+		l.Fatal("not set address and port")
 		return
 	}
 
@@ -30,7 +30,7 @@ func main() {
 	// Запуск подключения
 	c := NewTelnetClient(address, timeout, os.Stdin, os.Stdout)
 	if err := c.Connect(); err != nil {
-		slog.Error("Connect", "err", err)
+		l.Fatalf("connect: %v", err)
 		return
 	}
 
@@ -41,13 +41,13 @@ func main() {
 	// Конкурентные чтение и запись
 	go func() {
 		if err := c.Receive(); err != nil {
-			slog.Error("receive", "err", err)
+			l.Fatalf("receive: %v", err)
 		}
 	}()
 
 	go func() {
 		if err := c.Send(); err != nil {
-			slog.Error("send", "err", err)
+			l.Fatalf("send: %v", err)
 		}
 	}()
 
