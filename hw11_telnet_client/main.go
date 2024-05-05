@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"syscall"
+	"sync"
 	"time"
 )
 
@@ -22,7 +22,6 @@ func main() {
 
 	if len(flag.Args()) != 2 {
 		l.Fatal("not set address and port")
-		return
 	}
 
 	address := net.JoinHostPort(flag.Arg(0), flag.Arg(1))
@@ -31,25 +30,37 @@ func main() {
 	c := NewTelnetClient(address, timeout, os.Stdin, os.Stdout)
 	if err := c.Connect(); err != nil {
 		l.Fatalf("connect: %v", err)
-		return
 	}
 
 	// Настройка реагирования приложения на сигналы пользователя / операционной системы
-	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, os.Interrupt, os.Kill)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
 	// Конкурентные чтение и запись
+	wg := &sync.WaitGroup{}
+	wg.Add(3)
+
 	go func() {
+		defer wg.Done()
+		<-ctx.Done()
+		if err := c.Close(); err != nil {
+			l.Printf("Close: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
 		if err := c.Receive(); err != nil {
-			l.Fatalf("receive: %v", err)
+			l.Printf("receive: %v", err)
 		}
 	}()
 
 	go func() {
+		defer wg.Done()
 		if err := c.Send(); err != nil {
-			l.Fatalf("send: %v", err)
+			l.Printf("send: %v", err)
 		}
 	}()
 
-	<-ctx.Done()
+	wg.Wait()
 }

@@ -42,14 +42,12 @@ func (c *client) Connect() error {
 }
 
 func (c *client) Send() error {
-	n, err := io.Copy(c.con, c.in)
-	_ = n
+	_, err := io.Copy(c.con, c.in)
 	return err
 }
 
 func (c *client) Receive() error {
-	n, err := io.Copy(c.out, c.con)
-	_ = n
+	_, err := io.Copy(c.out, c.con)
 	return err
 }
 

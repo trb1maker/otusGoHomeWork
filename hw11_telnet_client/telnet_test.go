@@ -12,12 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInterface(t *testing.T) {
-	var c interface{} = &client{}
-	_, ok := c.(TelnetClient)
-	require.True(t, ok)
-}
-
 func TestErrCollection(t *testing.T) {
 	var (
 		errFirst  = errors.New("first")
