@@ -28,6 +28,7 @@ type (
 
 	Age struct {
 		Age int `validate:"min:18|max:50"`
+		p   int `validate:"in:0,1"`
 	}
 
 	OtherAge struct {
@@ -127,5 +128,14 @@ func TestValidate(t *testing.T) {
 				require.ErrorAs(t, err, &tt.expected)
 			})
 		}
+	})
+	t.Run("игнорирование приватных полей", func(t *testing.T) {
+		// Значение p соответствует тэгу
+		a := Age{Age: 34, p: 1}
+		require.NoError(t, Validate(a))
+
+		// Значение p тэгу не соответствует
+		a = Age{Age: 34, p: 2}
+		require.NoError(t, Validate(a))
 	})
 }

@@ -54,6 +54,9 @@ func validateStruct(v reflect.Value) error {
 		if !ok {
 			continue
 		}
+		if !v.Type().Field(i).IsExported() {
+			continue
+		}
 		if err := validateField(v.Field(i), tag); err != nil {
 			if isValidationError(err) {
 				valErrs = append(valErrs, ValidationError{
