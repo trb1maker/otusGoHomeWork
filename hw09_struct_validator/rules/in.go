@@ -1,12 +1,9 @@
 package rules
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 )
-
-var ErrIn = errors.New("not in list")
 
 // in.go:11:1: cognitive complexity 31 of func `validateIn` is high (> 30) (gocognit)
 //

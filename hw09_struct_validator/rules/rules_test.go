@@ -37,7 +37,7 @@ func TestLen(t *testing.T) {
 		require.NoError(t, validateLen("10", "2"))
 	})
 	t.Run("base error", func(t *testing.T) {
-		require.ErrorIs(t, validateLen("10", "11"), ErrLen)
+		require.ErrorIs(t, validateLen("10", "11"), ErrLength)
 	})
 }
 

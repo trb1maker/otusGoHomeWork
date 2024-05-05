@@ -84,7 +84,7 @@ func TestValidate(t *testing.T) {
 			in       interface{}
 			expected error
 		}{
-			{"len", App{Version: "10.0"}, rules.ErrLen},
+			{"len", App{Version: "10.0"}, rules.ErrLength},
 			{"in", Response{Code: 100, Body: "body"}, rules.ErrIn},
 			{"нарушение одного из правил", Age{Age: 100}, rules.ErrMax},
 		}

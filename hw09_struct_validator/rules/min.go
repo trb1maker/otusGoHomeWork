@@ -1,11 +1,8 @@
 package rules
 
 import (
-	"errors"
 	"strconv"
 )
-
-var ErrMin = errors.New("less than min")
 
 func min[T Number](v, m T) error {
 	if v < m {

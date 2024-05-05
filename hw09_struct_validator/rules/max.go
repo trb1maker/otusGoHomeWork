@@ -1,11 +1,8 @@
 package rules
 
 import (
-	"errors"
 	"strconv"
 )
-
-var ErrMax = errors.New("greater than max")
 
 func max[T Number](v, m T) error {
 	if v > m {

@@ -10,10 +10,7 @@ import (
 
 const validateTag = "validate"
 
-var (
-	valErrs      = []error{rules.ErrMax, rules.ErrMin, rules.ErrIn, rules.ErrLen, rules.ErrRegexp}
-	ErrNotStruct = errors.New("not a struct")
-)
+var ErrNotStruct = errors.New("not a struct")
 
 type ValidationError struct {
 	Field string
@@ -58,7 +55,8 @@ func validateStruct(v reflect.Value) error {
 			continue
 		}
 		if err := validateField(v.Field(i), tag); err != nil {
-			if isValidationError(err) {
+			var e *rules.ErrCode
+			if errors.As(err, &e) {
 				valErrs = append(valErrs, ValidationError{
 					Field: t.Name,
 					Err:   err,
@@ -122,13 +120,4 @@ func validateField(f reflect.Value, rule string) error {
 	default:
 		return rules.ErrUnsupportedType
 	}
-}
-
-func isValidationError(err error) bool {
-	for i := range valErrs {
-		if errors.Is(err, valErrs[i]) {
-			return true
-		}
-	}
-	return false
 }

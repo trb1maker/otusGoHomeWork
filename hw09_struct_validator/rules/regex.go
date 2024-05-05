@@ -1,11 +1,8 @@
 package rules
 
 import (
-	"errors"
 	"regexp"
 )
-
-var ErrRegexp = errors.New("regexp error")
 
 func validateRegexp(v string, rule string) error {
 	r, err := regexp.Compile(rule)
