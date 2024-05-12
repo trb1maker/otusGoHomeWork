@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net"
 	"sync"
@@ -10,6 +11,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestErrCollection(t *testing.T) {
+	var (
+		errFirst  = errors.New("first")
+		errSecond = errors.New("second")
+	)
+	err := joinErrs(nil, errFirst, nil, errSecond, nil)
+	require.ErrorIs(t, err, errFirst)
+	require.ErrorIs(t, err, errSecond)
+}
 
 func TestTelnetClient(t *testing.T) {
 	t.Run("basic", func(t *testing.T) {
