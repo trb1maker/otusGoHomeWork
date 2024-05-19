@@ -12,7 +12,7 @@ build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
 
 run: build
-	$(BIN) -config ./configs/config.toml
+	$(BIN) -config ./configs/config.yaml
 
 build-img:
 	docker build \
@@ -33,7 +33,7 @@ migrations_down:
 	GOOSE_MIGRATION_DIR=./migrations goose postgres "host=$(POSTGRES_HOST) port=5432 dbname=otus user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD)" down
 
 test:
-	go test -race ./internal/... ./pkg/...
+	go test -v -race ./internal/...
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.50.1
