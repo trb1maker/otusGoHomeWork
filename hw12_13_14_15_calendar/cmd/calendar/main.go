@@ -3,21 +3,22 @@ package main
 import (
 	"context"
 	"flag"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"golang.org/x/exp/slog"
+
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
-	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/etc/calendar/config.yaml", "Path to configuration file")
 }
 
 func main() {
@@ -28,16 +29,23 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	config, err := loadConfig(configFile)
+	if err != nil {
+		slog.Error("config", "err", err)
+		return
+	}
 
-	storage := memorystorage.New()
-	calendar := app.New(logg, storage)
+	var storage app.Storage
+	if config.Storage.Type == "postgres" {
+		storage = sqlstorage.New()
+	} else {
+		storage = memorystorage.New()
+	}
 
-	server := internalhttp.NewServer(logg, calendar)
+	calendar := app.New(storage)
+	server := internalhttp.NewServer(calendar)
 
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
 
 	go func() {
@@ -47,15 +55,15 @@ func main() {
 		defer cancel()
 
 		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
+			slog.Error("failed to stop http server", "err", err)
 		}
 	}()
 
-	logg.Info("calendar is running...")
+	slog.Info("calendar is running...")
 
 	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
 		cancel()
-		os.Exit(1) //nolint:gocritic
+		slog.Error("failed to start http server", "err", err)
+		return
 	}
 }
