@@ -7,12 +7,12 @@ import (
 	"syscall"
 	"time"
 
-	"golang.org/x/exp/slog"
+	"golang.org/x/exp/slog" //nolint:gci
 
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
 	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
-	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql"
+	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql" //nolint:gci
 )
 
 var configFile string
