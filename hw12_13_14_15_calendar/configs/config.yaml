@@ -1,0 +1,15 @@
+server:
+  http:
+    host: localhost
+    port: 8080
+storage:
+  type: postgres
+  postgres:
+    host: 192.168.0.103
+    port: 5432
+    database: otus
+    user: otus
+    password: 20240518_otus
+logger:
+  level: info
+  format: text
