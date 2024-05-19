@@ -2,30 +2,66 @@ package internalhttp
 
 import (
 	"context"
+	"errors"
+	"net"
+	"net/http"
+	"os"
+	"time"
+
+	"golang.org/x/exp/slog"
 )
 
-type Server struct { // TODO
+var ErrEnvServer = errors.New("server environment not set")
+
+type Server struct {
+	app Application
+	srv *http.Server
 }
 
-type Logger interface { // TODO
+type Application interface {
+	// TODO
 }
 
-type Application interface { // TODO
-}
+func NewServer(app Application) *Server {
+	mux := http.NewServeMux()
 
-func NewServer(logger Logger, app Application) *Server {
-	return &Server{}
+	s := &Server{
+		app: app,
+		srv: &http.Server{
+			Handler:           mux,
+			ReadHeaderTimeout: time.Second,
+			ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
+		},
+	}
+
+	mux.Handle("/ping", loggingMiddleware(http.HandlerFunc(s.ping)))
+
+	return s
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	// TODO
-	<-ctx.Done()
+	host, ok := os.LookupEnv("SERVERHOST")
+	if !ok {
+		return ErrEnvServer
+	}
+
+	port, ok := os.LookupEnv("SERVERPORT")
+	if !ok {
+		return ErrEnvServer
+	}
+
+	s.srv.Addr = host + ":" + port
+
+	s.srv.BaseContext = func(l net.Listener) context.Context {
+		return context.WithoutCancel(ctx)
+	}
+
+	if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
 	return nil
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	// TODO
-	return nil
+	return s.srv.Shutdown(ctx)
 }
-
-// TODO
