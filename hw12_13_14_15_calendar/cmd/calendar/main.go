@@ -11,7 +11,7 @@ import (
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
 	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
-	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql" //nolint:gci
+	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
@@ -30,19 +30,39 @@ func main() {
 
 	config, err := loadConfig(configFile)
 	if err != nil {
-		slog.Error("config", "err", err)
+		slog.Error("failed to load config", "err", err)
 		return
 	}
 
-	var storage app.Storage
+	var storage StorageConnectClose
 	if config.Storage.Type == "postgres" {
-		storage = sqlstorage.New()
+		storage, err = sqlstorage.New(
+			config.Storage.Postgres.Host,
+			config.Storage.Postgres.Port,
+			config.Storage.Postgres.Database,
+			config.Storage.Postgres.User,
+			config.Storage.Postgres.Password,
+		)
+		if err != nil {
+			slog.Error("failed to connect to postgres", "err", err)
+			return
+		}
 	} else {
-		storage = memorystorage.New()
+		storage, err = memorystorage.New()
+		if err != nil {
+			slog.Error("failed to connect to memory storage", "err", err)
+			return
+		}
 	}
 
+	if err := storage.Connect(context.Background()); err != nil {
+		slog.Error("failed to connect to storage", "err", err)
+		return
+	}
+	defer storage.Close(context.Background())
+
 	calendar := app.New(storage)
-	server := internalhttp.NewServer(calendar)
+	server := internalhttp.NewServer(calendar, config.Server.HTTP.Host, config.Server.HTTP.Port)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
@@ -65,4 +85,10 @@ func main() {
 		slog.Error("failed to start http server", "err", err)
 		return
 	}
+}
+
+type StorageConnectClose interface {
+	Connect(ctx context.Context) error
+	Close(ctx context.Context) error
+	app.Storage
 }
