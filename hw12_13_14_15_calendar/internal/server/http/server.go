@@ -6,11 +6,9 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
-	"os"
+	"strconv"
 	"time"
 )
-
-var ErrEnvServer = errors.New("server environment not set")
 
 type Server struct {
 	app Application
@@ -21,12 +19,13 @@ type Application interface {
 	// TODO
 }
 
-func NewServer(app Application) *Server {
+func NewServer(app Application, host string, port int) *Server {
 	mux := http.NewServeMux()
 
 	s := &Server{
 		app: app,
 		srv: &http.Server{
+			Addr:              net.JoinHostPort(host, strconv.Itoa(port)),
 			Handler:           mux,
 			ReadHeaderTimeout: time.Second,
 			ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
@@ -39,18 +38,6 @@ func NewServer(app Application) *Server {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	host, ok := os.LookupEnv("SERVERHOST")
-	if !ok {
-		return ErrEnvServer
-	}
-
-	port, ok := os.LookupEnv("SERVERPORT")
-	if !ok {
-		return ErrEnvServer
-	}
-
-	s.srv.Addr = host + ":" + port
-
 	s.srv.BaseContext = func(l net.Listener) context.Context {
 		return context.WithoutCancel(ctx)
 	}

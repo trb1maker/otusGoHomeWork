@@ -2,10 +2,8 @@ package internalhttp_test
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"sync"
 	"testing"
 	"time"
@@ -15,19 +13,10 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	config := map[string]string{
-		"SERVERHOST": "localhost",
-		"SERVERPORT": "12000",
-	}
-
-	for name, value := range config {
-		require.NoError(t, os.Setenv(name, value))
-	}
-
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
-	s := internalhttp.NewServer(nil)
+	s := internalhttp.NewServer(nil, "localhost", 12_000)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -46,7 +35,7 @@ func TestServer(t *testing.T) {
 		defer wg.Done()
 
 		//nolint:noctx
-		res, err := http.Get(fmt.Sprintf("http://%s:%s/ping", os.Getenv("SERVERHOST"), os.Getenv("SERVERPORT")))
+		res, err := http.Get("http://localhost:12000/ping")
 		require.NoError(t, err)
 		defer res.Body.Close()
 
