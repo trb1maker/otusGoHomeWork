@@ -4,75 +4,33 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"strconv"
+	"time"
 
 	"github.com/jackc/pgx"
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage"
 )
 
-var ErrEnvStorage = errors.New("server environment not set")
-
 type Storage struct {
 	db *pgx.Conn
 }
 
-func New() *Storage {
-	return &Storage{}
-}
-
-func (s *Storage) initConfig() (*pgx.ConnConfig, error) {
-	host, ok := os.LookupEnv("DBHOST")
-	if !ok {
-		return nil, ErrEnvStorage
+func New(host string, port uint16, dbName string, userName string, userPassword string) (*Storage, error) {
+	config := &pgx.ConnConfig{
+		Host:     host,
+		Port:     port,
+		Database: dbName,
+		User:     userName,
+		Password: userPassword,
 	}
-
-	port, ok := os.LookupEnv("DBPORT")
-	if !ok {
-		return nil, ErrEnvStorage
-	}
-	parsedPort, err := strconv.Atoi(port)
+	db, err := pgx.Connect(*config)
 	if err != nil {
 		return nil, err
 	}
 
-	dbname, ok := os.LookupEnv("DBNAME")
-	if !ok {
-		return nil, ErrEnvStorage
-	}
-
-	user, ok := os.LookupEnv("DBUSER")
-	if !ok {
-		return nil, ErrEnvStorage
-	}
-
-	password, ok := os.LookupEnv("DBPASSWORD")
-	if !ok {
-		return nil, ErrEnvStorage
-	}
-
-	config := &pgx.ConnConfig{
-		Host:     host,
-		Port:     uint16(parsedPort),
-		Database: dbname,
-		User:     user,
-		Password: password,
-	}
-
-	return config, nil
+	return &Storage{db: db}, nil
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
-	config, err := s.initConfig()
-	if err != nil {
-		return err
-	}
-
-	s.db, err = pgx.Connect(*config)
-	if err != nil {
-		return err
-	}
-
 	return s.db.Ping(ctx)
 }
 
@@ -119,7 +77,9 @@ func (s *Storage) SelectOne(ctx context.Context, eventID string) (storage.Event,
 		ctx,
 		`
 			select title, start_time, end_time, description, user_id, notify
-			from otus.events where event_id = $1 and is_deleted = false
+			from otus.events
+			where event_id = $1
+			  and is_deleted = false
 		`,
 		nil,
 		eventID,
@@ -198,4 +158,142 @@ func (s *Storage) DeleteOne(ctx context.Context, eventID string) error {
 	}
 
 	return tx.CommitEx(ctx)
+}
+
+func (s *Storage) SelectAllEvents(ctx context.Context, userID string) ([]storage.Event, error) {
+	rows, err := s.db.QueryEx(
+		ctx,
+		`
+			select event_id, title, start_time, end_time, description, notify
+			from otus.events
+			where is_deleted = false 
+			  and user_id = $1
+		`,
+		nil,
+		userID,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrNoData
+		}
+		return nil, err
+	}
+
+	var (
+		eventID, title, description string
+		startTime, endTime          time.Time
+		notify                      time.Duration
+
+		events []storage.Event
+	)
+
+	for rows.Next() {
+		if err := rows.Scan(&eventID, &title, &startTime, &endTime, &description, &notify); err != nil {
+			return nil, err
+		}
+		events = append(events, storage.Event{
+			ID:          eventID,
+			Title:       title,
+			StartTime:   startTime,
+			EndTime:     endTime,
+			Description: description,
+			Notify:      notify,
+			OwnerID:     userID,
+		})
+	}
+
+	return events, nil
+}
+
+func (s *Storage) SelectNextEvent(ctx context.Context, userID string) (storage.Event, error) {
+	result := s.db.QueryRowEx(
+		ctx,
+		`
+			select event_id, title, start_time, end_time, description, notify
+			from otus.events
+			where is_deleted = false
+			  and user_id = $1
+			  and start_time >= current_timestamp
+			order by start_time
+			limit 1
+		`,
+		nil,
+		userID,
+	)
+
+	var (
+		eventID, title, description string
+		startTime, endTime          time.Time
+		notify                      time.Duration
+	)
+	if err := result.Scan(&eventID, &title, &startTime, &endTime, &description, &notify); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return storage.Event{}, storage.ErrNoData
+		}
+		return storage.Event{}, err
+	}
+
+	return storage.Event{
+		ID:          eventID,
+		Title:       title,
+		StartTime:   startTime,
+		EndTime:     endTime,
+		Description: description,
+		Notify:      notify,
+		OwnerID:     userID,
+	}, nil
+}
+
+func (s *Storage) SelectEventsBetweenDates(
+	ctx context.Context,
+	userID string,
+	from time.Time,
+	to time.Time,
+) ([]storage.Event, error) {
+	rows, err := s.db.QueryEx(
+		ctx,
+		`
+			select event_id, title, start_time, end_time, description, notify
+			from otus.events
+			where is_deleted = false
+			  and user_id = $1
+			  and start_time >= $2
+			  and start_time <= $3
+		`,
+		nil,
+		userID,
+		from,
+		to,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrNoData
+		}
+		return nil, err
+	}
+
+	var (
+		eventID, title, description string
+		startTime, endTime          time.Time
+		notify                      time.Duration
+
+		events []storage.Event
+	)
+
+	for rows.Next() {
+		if err := rows.Scan(&eventID, &title, &startTime, &endTime, &description, &notify); err != nil {
+			return nil, err
+		}
+		events = append(events, storage.Event{
+			ID:          eventID,
+			Title:       title,
+			StartTime:   startTime,
+			EndTime:     endTime,
+			Description: description,
+			Notify:      notify,
+			OwnerID:     userID,
+		})
+	}
+
+	return events, nil
 }
