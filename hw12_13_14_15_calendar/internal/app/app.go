@@ -14,6 +14,9 @@ type App struct {
 type Storage interface {
 	InsertOne(context.Context, storage.Event) (string, error)
 	SelectOne(context.Context, string) (storage.Event, error)
+	SelectAllEvents(context.Context, string) ([]storage.Event, error)
+	SelectNextEvent(context.Context, string) (storage.Event, error)
+	SelectEventsBetweenDates(context.Context, string, time.Time, time.Time) ([]storage.Event, error)
 	UpdateOne(context.Context, storage.Event) error
 	DeleteOne(context.Context, string) error
 }
@@ -23,10 +26,6 @@ func New(storage Storage) *App {
 		store: storage,
 	}
 }
-
-// TODO: типы аргументов должны соответствовать возможностям HTTP и GRPC,
-// на текущий момент я реализую их в соответствии с типами Event,
-// позже, возможно поменяю.
 
 func (a *App) CreateEvent(
 	ctx context.Context,
@@ -60,4 +59,19 @@ func (a *App) DeleteEvent(ctx context.Context, eventID string) error {
 	return a.store.DeleteOne(ctx, eventID)
 }
 
-// TODO: Реализовать другие методы приложения после GRPC
+func (a *App) GetAllEvents(ctx context.Context, ownerID string) ([]storage.Event, error) {
+	return a.store.SelectAllEvents(ctx, ownerID)
+}
+
+func (a *App) GetNextEvent(ctx context.Context, ownerID string) (storage.Event, error) {
+	return a.store.SelectNextEvent(ctx, ownerID)
+}
+
+func (a *App) GetEventsFromRange(
+	ctx context.Context,
+	ownerID string,
+	from time.Time,
+	to time.Time,
+) ([]storage.Event, error) {
+	return a.store.SelectEventsBetweenDates(ctx, ownerID, from, to)
+}
