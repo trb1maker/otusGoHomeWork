@@ -34,7 +34,7 @@ func TestMiddleware(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, body, []byte("ping-pong"))
 
-		pattern := `time=[\d\-T:.Z]+ level=INFO msg=loggingMiddleware addr=[\d.:]+ method=GET path=\/ protocol=HTTP\/1.1 code=\d+ duration=\d+.+ user-agent=Go-http-client\/1.1` //nolint:lll
+		pattern := `time=[\d\-T:.+]+ level=INFO msg=loggingMiddleware addr=[\d.:]+ method=GET path=\/ protocol=HTTP\/1.1 code=\d+ duration=\d+.+ user-agent=Go-http-client\/1.1` //nolint:lll
 		require.Regexp(t, pattern, buf.String())
 	})
 }
