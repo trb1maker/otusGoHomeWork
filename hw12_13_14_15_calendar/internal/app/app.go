@@ -75,3 +75,21 @@ func (a *App) GetEventsFromRange(
 ) ([]storage.Event, error) {
 	return a.store.SelectEventsBetweenDates(ctx, ownerID, from, to)
 }
+
+func (a *App) GetEventsCurrentDay(ctx context.Context, ownerID string) ([]storage.Event, error) {
+	now := time.Now()
+
+	return a.GetEventsFromRange(ctx, ownerID, startOfDay(now), endOfDay(now))
+}
+
+func (a *App) GetEventsCurrentWeek(ctx context.Context, ownerID string) ([]storage.Event, error) {
+	now := time.Now()
+
+	return a.GetEventsFromRange(ctx, ownerID, startOfWeek(now), endOfWeek(now))
+}
+
+func (a *App) GetEventsCurrentMonth(ctx context.Context, ownerID string) ([]storage.Event, error) {
+	now := time.Now()
+
+	return a.GetEventsFromRange(ctx, ownerID, startOfMonth(now), endOfMonth(now))
+}
