@@ -1,11 +1,10 @@
 package main
 
 import (
+	"log/slog"
 	"os"
-	"strconv"
 
 	"github.com/go-yaml/yaml"
-	"golang.org/x/exp/slog"
 )
 
 func loadConfig(fileName string) (*config, error) {

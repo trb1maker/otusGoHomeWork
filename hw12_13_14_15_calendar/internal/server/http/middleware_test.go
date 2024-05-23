@@ -3,13 +3,13 @@ package internalhttp
 import (
 	"bytes"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slog"
 )
 
 func simpleHandler(w http.ResponseWriter, _ *http.Request) {

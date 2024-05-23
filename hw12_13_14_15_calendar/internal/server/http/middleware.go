@@ -1,10 +1,9 @@
 package internalhttp
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 type statusWriter struct {

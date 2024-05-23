@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"log/slog"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"golang.org/x/exp/slog" //nolint:gci
 
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
 	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"

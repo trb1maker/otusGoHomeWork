@@ -3,12 +3,11 @@ package internalhttp
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 var ErrEnvServer = errors.New("server environment not set")
