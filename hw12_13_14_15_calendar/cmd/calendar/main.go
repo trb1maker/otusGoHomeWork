@@ -3,21 +3,21 @@ package main
 import (
 	"context"
 	"flag"
-	"os"
+	"log/slog"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
+	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"
+	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/etc/calendar/config.yaml", "Path to configuration file")
 }
 
 func main() {
@@ -28,16 +28,43 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	config, err := loadConfig(configFile)
+	if err != nil {
+		slog.Error("failed to load config", "err", err)
+		return
+	}
 
-	storage := memorystorage.New()
-	calendar := app.New(logg, storage)
+	var storage StorageConnectClose
+	if config.Storage.Type == "postgres" {
+		storage, err = sqlstorage.New(
+			config.Storage.Postgres.Host,
+			config.Storage.Postgres.Port,
+			config.Storage.Postgres.Database,
+			config.Storage.Postgres.User,
+			config.Storage.Postgres.Password,
+		)
+		if err != nil {
+			slog.Error("failed to connect to postgres", "err", err)
+			return
+		}
+	} else {
+		storage, err = memorystorage.New()
+		if err != nil {
+			slog.Error("failed to connect to memory storage", "err", err)
+			return
+		}
+	}
 
-	server := internalhttp.NewServer(logg, calendar)
+	if err := storage.Connect(context.Background()); err != nil {
+		slog.Error("failed to connect to storage", "err", err)
+		return
+	}
+	defer storage.Close(context.Background())
 
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	calendar := app.New(storage)
+	server := internalhttp.NewServer(calendar, config.Server.HTTP.Host, config.Server.HTTP.Port)
+
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
 
 	go func() {
@@ -47,15 +74,21 @@ func main() {
 		defer cancel()
 
 		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
+			slog.Error("failed to stop http server", "err", err)
 		}
 	}()
 
-	logg.Info("calendar is running...")
+	slog.Info("calendar is running...")
 
 	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
 		cancel()
-		os.Exit(1) //nolint:gocritic
+		slog.Error("failed to start http server", "err", err)
+		return
 	}
+}
+
+type StorageConnectClose interface {
+	Connect(ctx context.Context) error
+	Close(ctx context.Context) error
+	app.Storage
 }
