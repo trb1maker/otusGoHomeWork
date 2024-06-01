@@ -282,3 +282,11 @@ func (s *Storage) SelectEventsBetweenDates(
 
 	return events, nil
 }
+
+func (s *Storage) RegisterUser(ctx context.Context) (userID string, err error) {
+	userID = uuid.New().String()
+	if _, err := s.db.ExecContext(ctx, "insert into users (user_id) values ($1)", userID); err != nil {
+		return "", err
+	}
+	return userID, err
+}

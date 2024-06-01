@@ -1,4 +1,4 @@
-package memorystorage
+package memorystorage_test
 
 import (
 	"context"
@@ -8,23 +8,26 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage"
+	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
 )
 
 func TestStorage(t *testing.T) {
-	store, err := New()
+	store, err := memorystorage.New()
 	require.NoError(t, err)
-
-	const ownerID = "62e1352f-f269-43ae-b784-272d9d8e4f8a"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	var ownerID string
+
 	t.Run("подключение", func(t *testing.T) {
 		require.NoError(t, store.Connect(context.Background()))
+	})
 
-		// Пользователь должен быть в таблице users
-		_, err = store.db.ExecContext(ctx, "insert into users (user_id) values ($1)", ownerID)
+	t.Run("регистрация пользователя", func(t *testing.T) {
+		ownerID, err = store.RegisterUser(ctx)
 		require.NoError(t, err)
+		require.NotZero(t, ownerID)
 	})
 
 	t.Run("нормальные сценарии", func(t *testing.T) {

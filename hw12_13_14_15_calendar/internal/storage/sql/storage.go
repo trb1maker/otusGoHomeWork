@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx"
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage"
 )
@@ -296,4 +297,12 @@ func (s *Storage) SelectEventsBetweenDates(
 	}
 
 	return events, nil
+}
+
+func (s *Storage) RegisterUser(ctx context.Context) (userID string, err error) {
+	userID = uuid.New().String()
+	if _, err := s.db.ExecEx(ctx, "insert into otus.users (user_id) values ($1)", nil, userID); err != nil {
+		return "", err
+	}
+	return userID, err
 }

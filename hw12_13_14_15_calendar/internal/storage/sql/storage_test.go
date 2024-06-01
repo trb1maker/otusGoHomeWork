@@ -19,13 +19,19 @@ func TestStorage(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	var ownerID string
+
 	t.Run("подключение", func(t *testing.T) {
 		require.NoError(t, store.Connect(ctx))
 	})
 
+	t.Run("регистрация нового пользователя", func(t *testing.T) {
+		ownerID, err = store.RegisterUser(ctx)
+		require.NoError(t, err)
+	})
+
 	t.Run("нормальные сценарии", func(t *testing.T) {
 		var (
-			ownerID   = "ef6acd9c-7385-420d-b408-f0029a9decc3"
 			startTime = time.Now().UTC()
 			endTime   = startTime.Add(time.Hour)
 			notify    = endTime.Sub(startTime)
@@ -66,6 +72,7 @@ func TestStorage(t *testing.T) {
 		require.ErrorIs(t, store.DeleteOne(ctx, "62e1352f-f269-43ae-b784-272d9d8e4f8a"), storage.ErrNotFound)
 	})
 
+	//nolint: revive
 	t.Run("сложные сценарии", func(t *testing.T) {
 		// TODO: Добавить тесты на другие сценарии
 	})
