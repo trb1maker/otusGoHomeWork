@@ -5,10 +5,12 @@ import (
 	"flag"
 	"log/slog"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/app"
+	internalgrpc "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/grpc"
 	internalhttp "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/memory"
 	sqlstorage "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage/sql"
@@ -62,7 +64,12 @@ func main() {
 	defer storage.Close(context.Background())
 
 	calendar := app.New(storage)
-	server := internalhttp.NewServer(calendar, config.Server.HTTP.Host, config.Server.HTTP.Port)
+
+	httpServer := internalhttp.NewServer(calendar, config.Server.HTTP.Host, config.Server.HTTP.Port)
+	grpcServer := internalgrpc.NewServer(calendar, config.Server.GRPC.Host, config.Server.GRPC.Port)
+
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
@@ -73,18 +80,32 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
 
-		if err := server.Stop(ctx); err != nil {
+		if err := httpServer.Stop(ctx); err != nil {
 			slog.Error("failed to stop http server", "err", err)
 		}
 	}()
 
 	slog.Info("calendar is running...")
 
-	if err := server.Start(ctx); err != nil {
-		cancel()
-		slog.Error("failed to start http server", "err", err)
-		return
-	}
+	go func() {
+		defer wg.Done()
+		if err := httpServer.Start(ctx); err != nil {
+			cancel()
+			slog.Error("failed to start http server", "err", err)
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := grpcServer.Start(ctx); err != nil {
+			cancel()
+			slog.Error("failed to start grpc server", "err", err)
+			return
+		}
+	}()
+
+	wg.Wait()
 }
 
 type StorageConnectClose interface {
