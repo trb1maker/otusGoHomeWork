@@ -116,7 +116,7 @@ func TestInternalHandlers(t *testing.T) {
 	})
 
 	t.Run("get all events", func(t *testing.T) {
-		for range 5 {
+		for i := 0; i <= 5; i++ {
 			easyjson.MarshalToWriter(startEvent, buf)
 
 			req := httptest.NewRequest(http.MethodPost, "/event", buf)

@@ -72,11 +72,6 @@ func TestStorage(t *testing.T) {
 		require.ErrorIs(t, store.DeleteOne(ctx, "62e1352f-f269-43ae-b784-272d9d8e4f8a"), storage.ErrNotFound)
 	})
 
-	//nolint: revive
-	t.Run("сложные сценарии", func(t *testing.T) {
-		// TODO: Добавить тесты на другие сценарии
-	})
-
 	t.Run("отключение", func(t *testing.T) {
 		require.NoError(t, store.Close(ctx))
 	})
