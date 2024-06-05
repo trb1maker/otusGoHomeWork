@@ -60,7 +60,7 @@ func (s *Server) Stop() {
 	s.srv.Stop()
 }
 
-func (s *Server) NewEvent(ctx context.Context, e *api.Event) (*api.Response, error) {
+func (s *Server) NewEvent(ctx context.Context, e *api.Event) (*api.EventIdResponse, error) {
 	eventID, err := s.app.CreateEvent(
 		ctx,
 		e.GetOwner(),
@@ -73,15 +73,15 @@ func (s *Server) NewEvent(ctx context.Context, e *api.Event) (*api.Response, err
 	if err != nil {
 		return nil, err
 	}
-	return &api.Response{EventId: eventID}, nil
+	return &api.EventIdResponse{EventId: eventID}, nil
 }
 
-func (s *Server) GetEvent(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) GetEvent(ctx context.Context, r *api.EventRequest) (*api.EventResponse, error) {
 	event, err := s.app.GetEvent(ctx, r.GetEventId())
 	if err != nil {
 		return nil, err
 	}
-	return &api.Response{Events: []*api.Event{{
+	return &api.EventResponse{Events: []*api.Event{{
 		Id:          event.ID,
 		Title:       event.Title,
 		StartTime:   timestamppb.New(event.StartTime),
@@ -107,15 +107,15 @@ func (s *Server) UpdateEvent(ctx context.Context, e *api.Event) (*emptypb.Empty,
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) DeleteEvent(ctx context.Context, r *api.Request) (*emptypb.Empty, error) {
+func (s *Server) DeleteEvent(ctx context.Context, r *api.EventRequest) (*emptypb.Empty, error) {
 	if err := s.app.DeleteEvent(ctx, r.GetEventId()); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
 
-func transform(ee ...storage.Event) *api.Response {
-	dto := &api.Response{Events: make([]*api.Event, 0, len(ee))}
+func transform(ee ...storage.Event) *api.EventResponse {
+	dto := &api.EventResponse{Events: make([]*api.Event, 0, len(ee))}
 	for i := 0; i < len(ee); i++ {
 		dto.Events = append(dto.Events, &api.Event{
 			Id:          ee[i].ID,
@@ -130,7 +130,7 @@ func transform(ee ...storage.Event) *api.Response {
 	return dto
 }
 
-func (s *Server) All(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) All(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	events, err := s.app.GetAllEvents(ctx, r.GetUserId())
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func (s *Server) All(ctx context.Context, r *api.Request) (*api.Response, error)
 	return transform(events...), nil
 }
 
-func (s *Server) Next(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) Next(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	event, err := s.app.GetNextEvent(ctx, r.GetUserId())
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (s *Server) Next(ctx context.Context, r *api.Request) (*api.Response, error
 	return transform(event), nil
 }
 
-func (s *Server) Day(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) Day(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	events, err := s.app.GetEventsCurrentDay(ctx, r.GetUserId())
 	if err != nil {
 		return nil, err
@@ -154,7 +154,7 @@ func (s *Server) Day(ctx context.Context, r *api.Request) (*api.Response, error)
 	return transform(events...), nil
 }
 
-func (s *Server) Week(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) Week(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	events, err := s.app.GetEventsCurrentWeek(ctx, r.GetUserId())
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func (s *Server) Week(ctx context.Context, r *api.Request) (*api.Response, error
 	return transform(events...), nil
 }
 
-func (s *Server) Month(ctx context.Context, r *api.Request) (*api.Response, error) {
+func (s *Server) Month(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	events, err := s.app.GetEventsCurrentMonth(ctx, r.GetUserId())
 	if err != nil {
 		return nil, err

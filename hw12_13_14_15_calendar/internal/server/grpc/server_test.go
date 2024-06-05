@@ -62,11 +62,11 @@ func TestServer(t *testing.T) {
 		_, err = client.UpdateEvent(ctx, event)
 		require.NoError(t, err)
 
-		events, err := client.All(ctx, &api.Request{UserId: userID})
+		events, err := client.All(ctx, &api.UserRequest{UserId: userID})
 		require.NoError(t, err)
 		require.Len(t, events.Events, 1)
 
-		_, err = client.DeleteEvent(ctx, &api.Request{EventId: event.Id})
+		_, err = client.DeleteEvent(ctx, &api.EventRequest{EventId: event.Id})
 		require.NoError(t, err)
 
 		cancel()

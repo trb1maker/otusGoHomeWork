@@ -18,26 +18,31 @@ message Event {
     google.protobuf.Duration  notify      = 7;
 }
 
-message Request {
-    string userId  = 1;
-    string eventId = 2;
-    Event event    = 3;
+message EventRequest {
+    string eventId = 1;
 }
 
-message Response {
-    string         eventId = 1;
+message UserRequest {
+    string userId  = 1;
+}
+
+message EventIdResponse {
+    string eventId = 1;
+}
+
+message EventResponse {
     repeated Event events  = 2;
 }
 
 service EventService {
-    rpc newEvent(Event) returns (Response);
-    rpc getEvent(Request) returns (Response);
+    rpc newEvent(Event) returns (EventIdResponse);
+    rpc getEvent(EventRequest) returns (EventResponse);
     rpc updateEvent(Event) returns (google.protobuf.Empty);
-    rpc deleteEvent(Request) returns (google.protobuf.Empty);
+    rpc deleteEvent(EventRequest) returns (google.protobuf.Empty);
 
-    rpc all(Request) returns (Response);
-    rpc next(Request) returns (Response);
-    rpc day(Request) returns (Response);
-    rpc week(Request) returns (Response);
-    rpc month(Request) returns (Response);
+    rpc all(UserRequest) returns (EventResponse);
+    rpc next(UserRequest) returns (EventResponse);
+    rpc day(UserRequest) returns (EventResponse);
+    rpc week(UserRequest) returns (EventResponse);
+    rpc month(UserRequest) returns (EventResponse);
 }

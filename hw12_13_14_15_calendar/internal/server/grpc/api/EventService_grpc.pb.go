@@ -35,15 +35,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EventServiceClient interface {
-	NewEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*Response, error)
-	GetEvent(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	NewEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*EventIdResponse, error)
+	GetEvent(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventResponse, error)
 	UpdateEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	DeleteEvent(ctx context.Context, in *Request, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	All(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	Next(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	Day(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	Week(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	Month(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	DeleteEvent(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	All(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error)
+	Next(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error)
+	Day(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error)
+	Week(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error)
+	Month(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error)
 }
 
 type eventServiceClient struct {
@@ -54,9 +54,9 @@ func NewEventServiceClient(cc grpc.ClientConnInterface) EventServiceClient {
 	return &eventServiceClient{cc}
 }
 
-func (c *eventServiceClient) NewEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) NewEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*EventIdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventIdResponse)
 	err := c.cc.Invoke(ctx, EventService_NewEvent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -64,9 +64,9 @@ func (c *eventServiceClient) NewEvent(ctx context.Context, in *Event, opts ...gr
 	return out, nil
 }
 
-func (c *eventServiceClient) GetEvent(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) GetEvent(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_GetEvent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c *eventServiceClient) UpdateEvent(ctx context.Context, in *Event, opts ..
 	return out, nil
 }
 
-func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *Request, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, EventService_DeleteEvent_FullMethodName, in, out, cOpts...)
@@ -94,9 +94,9 @@ func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *Request, opts 
 	return out, nil
 }
 
-func (c *eventServiceClient) All(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) All(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_All_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -104,9 +104,9 @@ func (c *eventServiceClient) All(ctx context.Context, in *Request, opts ...grpc.
 	return out, nil
 }
 
-func (c *eventServiceClient) Next(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) Next(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_Next_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -114,9 +114,9 @@ func (c *eventServiceClient) Next(ctx context.Context, in *Request, opts ...grpc
 	return out, nil
 }
 
-func (c *eventServiceClient) Day(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) Day(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_Day_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -124,9 +124,9 @@ func (c *eventServiceClient) Day(ctx context.Context, in *Request, opts ...grpc.
 	return out, nil
 }
 
-func (c *eventServiceClient) Week(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) Week(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_Week_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -134,9 +134,9 @@ func (c *eventServiceClient) Week(ctx context.Context, in *Request, opts ...grpc
 	return out, nil
 }
 
-func (c *eventServiceClient) Month(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *eventServiceClient) Month(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*EventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Response)
+	out := new(EventResponse)
 	err := c.cc.Invoke(ctx, EventService_Month_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -148,15 +148,15 @@ func (c *eventServiceClient) Month(ctx context.Context, in *Request, opts ...grp
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility
 type EventServiceServer interface {
-	NewEvent(context.Context, *Event) (*Response, error)
-	GetEvent(context.Context, *Request) (*Response, error)
+	NewEvent(context.Context, *Event) (*EventIdResponse, error)
+	GetEvent(context.Context, *EventRequest) (*EventResponse, error)
 	UpdateEvent(context.Context, *Event) (*emptypb.Empty, error)
-	DeleteEvent(context.Context, *Request) (*emptypb.Empty, error)
-	All(context.Context, *Request) (*Response, error)
-	Next(context.Context, *Request) (*Response, error)
-	Day(context.Context, *Request) (*Response, error)
-	Week(context.Context, *Request) (*Response, error)
-	Month(context.Context, *Request) (*Response, error)
+	DeleteEvent(context.Context, *EventRequest) (*emptypb.Empty, error)
+	All(context.Context, *UserRequest) (*EventResponse, error)
+	Next(context.Context, *UserRequest) (*EventResponse, error)
+	Day(context.Context, *UserRequest) (*EventResponse, error)
+	Week(context.Context, *UserRequest) (*EventResponse, error)
+	Month(context.Context, *UserRequest) (*EventResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -164,31 +164,31 @@ type EventServiceServer interface {
 type UnimplementedEventServiceServer struct {
 }
 
-func (UnimplementedEventServiceServer) NewEvent(context.Context, *Event) (*Response, error) {
+func (UnimplementedEventServiceServer) NewEvent(context.Context, *Event) (*EventIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewEvent not implemented")
 }
-func (UnimplementedEventServiceServer) GetEvent(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) GetEvent(context.Context, *EventRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEvent not implemented")
 }
 func (UnimplementedEventServiceServer) UpdateEvent(context.Context, *Event) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEvent not implemented")
 }
-func (UnimplementedEventServiceServer) DeleteEvent(context.Context, *Request) (*emptypb.Empty, error) {
+func (UnimplementedEventServiceServer) DeleteEvent(context.Context, *EventRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
 }
-func (UnimplementedEventServiceServer) All(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) All(context.Context, *UserRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method All not implemented")
 }
-func (UnimplementedEventServiceServer) Next(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) Next(context.Context, *UserRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Next not implemented")
 }
-func (UnimplementedEventServiceServer) Day(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) Day(context.Context, *UserRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Day not implemented")
 }
-func (UnimplementedEventServiceServer) Week(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) Week(context.Context, *UserRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Week not implemented")
 }
-func (UnimplementedEventServiceServer) Month(context.Context, *Request) (*Response, error) {
+func (UnimplementedEventServiceServer) Month(context.Context, *UserRequest) (*EventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Month not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}
@@ -223,7 +223,7 @@ func _EventService_NewEvent_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _EventService_GetEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(EventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -235,7 +235,7 @@ func _EventService_GetEvent_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: EventService_GetEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).GetEvent(ctx, req.(*Request))
+		return srv.(EventServiceServer).GetEvent(ctx, req.(*EventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -259,7 +259,7 @@ func _EventService_UpdateEvent_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _EventService_DeleteEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(EventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -271,13 +271,13 @@ func _EventService_DeleteEvent_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: EventService_DeleteEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).DeleteEvent(ctx, req.(*Request))
+		return srv.(EventServiceServer).DeleteEvent(ctx, req.(*EventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EventService_All_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -289,13 +289,13 @@ func _EventService_All_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: EventService_All_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).All(ctx, req.(*Request))
+		return srv.(EventServiceServer).All(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EventService_Next_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -307,13 +307,13 @@ func _EventService_Next_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: EventService_Next_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).Next(ctx, req.(*Request))
+		return srv.(EventServiceServer).Next(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EventService_Day_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -325,13 +325,13 @@ func _EventService_Day_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: EventService_Day_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).Day(ctx, req.(*Request))
+		return srv.(EventServiceServer).Day(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EventService_Week_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -343,13 +343,13 @@ func _EventService_Week_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: EventService_Week_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).Week(ctx, req.(*Request))
+		return srv.(EventServiceServer).Week(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EventService_Month_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -361,7 +361,7 @@ func _EventService_Month_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: EventService_Month_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).Month(ctx, req.(*Request))
+		return srv.(EventServiceServer).Month(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
