@@ -42,12 +42,6 @@ lint: install-lint-deps
 	golangci-lint run ./...
 
 generate:
-	protoc \
-		--proto_path=api \
-		--go_out=internal/server/grpc/api \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=internal/server/grpc/api \
-		--go-grpc_opt=paths=source_relative \
-		api/EventService.proto
+	go generate ./...
 
 .PHONY: build run build-img run-img version test lint
