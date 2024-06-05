@@ -35,7 +35,7 @@ func TestServer(t *testing.T) {
 	server := NewServer(app.New(store), "localhost", 8081)
 
 	go func() {
-		require.NoError(t, server.Start(ctx))
+		require.NoError(t, server.Start())
 	}()
 
 	go func() {
@@ -73,6 +73,7 @@ func TestServer(t *testing.T) {
 	}()
 
 	<-ctx.Done()
+	server.Stop()
 
 	logResult := buf.String()
 	require.NotZero(t, logResult)

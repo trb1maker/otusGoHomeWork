@@ -83,6 +83,8 @@ func main() {
 		if err := httpServer.Stop(ctx); err != nil {
 			slog.Error("failed to stop http server", "err", err)
 		}
+
+		grpcServer.Stop()
 	}()
 
 	slog.Info("calendar is running...")
@@ -98,7 +100,7 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		if err := grpcServer.Start(ctx); err != nil {
+		if err := grpcServer.Start(); err != nil {
 			cancel()
 			slog.Error("failed to start grpc server", "err", err)
 			return

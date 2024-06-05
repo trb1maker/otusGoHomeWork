@@ -31,6 +31,7 @@ type Application interface {
 type Server struct {
 	api.UnimplementedEventServiceServer
 	app     Application
+	srv     *grpc.Server
 	address string
 }
 
@@ -41,23 +42,22 @@ func NewServer(app Application, host string, port int) *Server {
 	}
 }
 
-func (s *Server) Start(ctx context.Context) error {
+func (s *Server) Start() error {
 	lis, err := net.Listen("tcp", s.address)
 	if err != nil {
 		return err
 	}
 	defer lis.Close()
 
-	srv := grpc.NewServer(grpc.UnaryInterceptor(logginInterceptor))
+	s.srv = grpc.NewServer(grpc.UnaryInterceptor(logginInterceptor))
 
-	go func() {
-		<-ctx.Done()
-		srv.Stop()
-	}()
+	api.RegisterEventServiceServer(s.srv, s)
 
-	api.RegisterEventServiceServer(srv, s)
+	return s.srv.Serve(lis)
+}
 
-	return srv.Serve(lis)
+func (s *Server) Stop() {
+	s.srv.Stop()
 }
 
 func (s *Server) NewEvent(ctx context.Context, e *api.Event) (*api.Response, error) {
