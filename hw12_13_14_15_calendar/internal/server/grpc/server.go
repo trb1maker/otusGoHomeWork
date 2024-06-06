@@ -26,6 +26,9 @@ type Application interface {
 	GetEventsCurrentDay(ctx context.Context, ownerID string) ([]storage.Event, error)
 	GetEventsCurrentWeek(ctx context.Context, ownerID string) ([]storage.Event, error)
 	GetEventsCurrentMonth(ctx context.Context, ownerID string) ([]storage.Event, error)
+	GetEventsDayAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
+	GetEventsWeekAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
+	GetEventsMonthAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
 }
 
 type Server struct {
@@ -164,6 +167,30 @@ func (s *Server) Week(ctx context.Context, r *api.UserRequest) (*api.EventRespon
 
 func (s *Server) Month(ctx context.Context, r *api.UserRequest) (*api.EventResponse, error) {
 	events, err := s.app.GetEventsCurrentMonth(ctx, r.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return transform(events...), nil
+}
+
+func (s *Server) SinceDay(ctx context.Context, r *api.ListRequest) (*api.EventResponse, error) {
+	events, err := s.app.GetEventsDayAfter(ctx, r.GetUserId(), r.GetStart().AsTime())
+	if err != nil {
+		return nil, err
+	}
+	return transform(events...), nil
+}
+
+func (s *Server) SinceWeek(ctx context.Context, r *api.ListRequest) (*api.EventResponse, error) {
+	events, err := s.app.GetEventsWeekAfter(ctx, r.GetUserId(), r.GetStart().AsTime())
+	if err != nil {
+		return nil, err
+	}
+	return transform(events...), nil
+}
+
+func (s *Server) SinceMonth(ctx context.Context, r *api.ListRequest) (*api.EventResponse, error) {
+	events, err := s.app.GetEventsMonthAfter(ctx, r.GetUserId(), r.GetStart().AsTime())
 	if err != nil {
 		return nil, err
 	}

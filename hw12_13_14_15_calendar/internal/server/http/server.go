@@ -29,6 +29,9 @@ type Application interface {
 	GetEventsCurrentDay(ctx context.Context, ownerID string) ([]storage.Event, error)
 	GetEventsCurrentWeek(ctx context.Context, ownerID string) ([]storage.Event, error)
 	GetEventsCurrentMonth(ctx context.Context, ownerID string) ([]storage.Event, error)
+	GetEventsDayAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
+	GetEventsWeekAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
+	GetEventsMonthAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error)
 }
 
 func NewServer(app Application, host string, port int) *Server {

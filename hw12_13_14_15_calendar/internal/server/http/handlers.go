@@ -3,6 +3,7 @@ package internalhttp
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/mailru/easyjson"
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage"
@@ -139,10 +140,26 @@ func (s *Server) getNextEvent(w http.ResponseWriter, r *http.Request) {
 	easyjson.MarshalToHTTPResponseWriter(dto{Ok: true, Count: 1, Events: []storage.Event{event}}, w)
 }
 
+//nolint:all
 func (s *Server) getDayEvents(w http.ResponseWriter, r *http.Request) {
+	var (
+		events []storage.Event
+		err    error
+	)
+
 	userID := r.PathValue("userID")
 
-	events, err := s.app.GetEventsCurrentDay(r.Context(), userID)
+	startOption := r.FormValue("start")
+	if startOption == "" {
+		events, err = s.app.GetEventsCurrentDay(r.Context(), userID)
+	} else {
+		startTime, err := time.Parse(time.DateOnly, startOption)
+		if err != nil {
+			easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
+			return
+		}
+		events, err = s.app.GetEventsDayAfter(r.Context(), userID, startTime)
+	}
 	if err != nil {
 		if errors.Is(err, storage.ErrNoData) {
 			easyjson.MarshalToHTTPResponseWriter(dto{Ok: true}, w)
@@ -151,13 +168,30 @@ func (s *Server) getDayEvents(w http.ResponseWriter, r *http.Request) {
 		easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
 		return
 	}
+
 	easyjson.MarshalToHTTPResponseWriter(dto{Ok: true, Count: len(events), Events: events}, w)
 }
 
+//nolint:all
 func (s *Server) getWeekEvents(w http.ResponseWriter, r *http.Request) {
+	var (
+		events []storage.Event
+		err    error
+	)
+
 	userID := r.PathValue("userID")
 
-	events, err := s.app.GetEventsCurrentWeek(r.Context(), userID)
+	startOption := r.FormValue("start")
+	if startOption == "" {
+		events, err = s.app.GetEventsCurrentWeek(r.Context(), userID)
+	} else {
+		startTime, err := time.Parse(time.DateOnly, startOption)
+		if err != nil {
+			easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
+			return
+		}
+		events, err = s.app.GetEventsWeekAfter(r.Context(), userID, startTime)
+	}
 	if err != nil {
 		if errors.Is(err, storage.ErrNoData) {
 			easyjson.MarshalToHTTPResponseWriter(dto{Ok: true}, w)
@@ -166,13 +200,30 @@ func (s *Server) getWeekEvents(w http.ResponseWriter, r *http.Request) {
 		easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
 		return
 	}
+
 	easyjson.MarshalToHTTPResponseWriter(dto{Ok: true, Count: len(events), Events: events}, w)
 }
 
+//nolint:all
 func (s *Server) getMonthEvents(w http.ResponseWriter, r *http.Request) {
+	var (
+		events []storage.Event
+		err    error
+	)
+
 	userID := r.PathValue("userID")
 
-	events, err := s.app.GetEventsCurrentMonth(r.Context(), userID)
+	startOption := r.FormValue("start")
+	if startOption == "" {
+		events, err = s.app.GetEventsCurrentMonth(r.Context(), userID)
+	} else {
+		startTime, err := time.Parse(time.DateOnly, startOption)
+		if err != nil {
+			easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
+			return
+		}
+		events, err = s.app.GetEventsMonthAfter(r.Context(), userID, startTime)
+	}
 	if err != nil {
 		if errors.Is(err, storage.ErrNoData) {
 			easyjson.MarshalToHTTPResponseWriter(dto{Ok: true}, w)
@@ -181,5 +232,6 @@ func (s *Server) getMonthEvents(w http.ResponseWriter, r *http.Request) {
 		easyjson.MarshalToHTTPResponseWriter(dto{Ok: false, Details: err.Error()}, w)
 		return
 	}
+
 	easyjson.MarshalToHTTPResponseWriter(dto{Ok: true, Count: len(events), Events: events}, w)
 }

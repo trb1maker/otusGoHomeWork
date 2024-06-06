@@ -203,4 +203,96 @@ func TestInternalHandlers(t *testing.T) {
 		require.Equal(t, obj.Count, 5)
 		require.Len(t, obj.Events, 5)
 	})
+
+	store.Close(context.Background())
+}
+
+func TestUserMethods(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	store, err := memorystorage.New()
+	require.NoError(t, err)
+	require.NoError(t, store.Connect(ctx))
+
+	userID, err := store.RegisterUser(ctx)
+	require.NoError(t, err)
+
+	srv := NewServer(app.New(store), "localhost", 12000)
+	buf := &bytes.Buffer{}
+
+	events := []storage.Event{
+		{
+			Title:     "test event",
+			StartTime: time.Date(2023, 1, 1, 12, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2023, 1, 1, 13, 0, 0, 0, time.UTC),
+			OwnerID:   userID,
+		},
+		{
+			Title:     "test event",
+			StartTime: time.Date(2023, 1, 1, 15, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2023, 1, 1, 16, 0, 0, 0, time.UTC),
+			OwnerID:   userID,
+		},
+		{
+			Title:     "test event",
+			StartTime: time.Date(2023, 1, 14, 15, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2023, 1, 14, 16, 0, 0, 0, time.UTC),
+			OwnerID:   userID,
+		},
+	}
+
+	for i := 0; i < len(events); i++ {
+		_, err := easyjson.MarshalToWriter(events[i], buf)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPost, "/event", buf)
+		w := httptest.NewRecorder()
+
+		srv.postEvent(w, req)
+		require.Equal(t, w.Result().StatusCode, http.StatusOK) //nolint: bodyclose
+		buf.Reset()
+	}
+
+	// События за день.
+	req := httptest.NewRequest(http.MethodGet, "/user/{userID}/day?start=2023-01-01", nil)
+	req.SetPathValue("userID", userID)
+	w := httptest.NewRecorder()
+
+	srv.getDayEvents(w, req)
+	require.Equal(t, w.Result().StatusCode, http.StatusOK) //nolint: bodyclose
+
+	var obj dto
+	require.NoError(t, easyjson.UnmarshalFromReader(w.Body, &obj))
+	require.True(t, obj.Ok)
+	require.Equal(t, obj.Count, 2)
+	require.Len(t, obj.Events, 2)
+
+	// События за неделю
+	req = httptest.NewRequest(http.MethodGet, "/user/{userID}/week?start=2022-12-26", nil)
+	req.SetPathValue("userID", userID)
+	w = httptest.NewRecorder()
+
+	srv.getWeekEvents(w, req)
+	require.Equal(t, w.Result().StatusCode, http.StatusOK) //nolint: bodyclose
+
+	require.NoError(t, easyjson.UnmarshalFromReader(w.Body, &obj))
+	require.True(t, obj.Ok)
+	require.Equal(t, obj.Count, 2)
+	require.Len(t, obj.Events, 2)
+
+	// События за месяц
+	req = httptest.NewRequest(http.MethodGet, "/user/{userID}/week?start=2023-01-01", nil)
+	req.SetPathValue("userID", userID)
+	w = httptest.NewRecorder()
+
+	srv.getMonthEvents(w, req)
+	require.Equal(t, w.Result().StatusCode, http.StatusOK) //nolint: bodyclose
+
+	require.NoError(t, easyjson.UnmarshalFromReader(w.Body, &obj))
+	require.True(t, obj.Ok)
+	require.Equal(t, obj.Count, 3)
+	require.Len(t, obj.Events, 3)
+
+	store.Close(context.Background())
 }

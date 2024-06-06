@@ -34,6 +34,11 @@ message EventResponse {
     repeated Event events  = 2;
 }
 
+message ListRequest {
+    string                    userId  = 1;
+    google.protobuf.Timestamp start   = 2;
+}
+
 service EventService {
     rpc newEvent(Event) returns (EventIdResponse);
     rpc getEvent(EventRequest) returns (EventResponse);
@@ -45,4 +50,8 @@ service EventService {
     rpc day(UserRequest) returns (EventResponse);
     rpc week(UserRequest) returns (EventResponse);
     rpc month(UserRequest) returns (EventResponse);
+
+    rpc sinceDay(ListRequest) returns (EventResponse);
+    rpc sinceWeek(ListRequest) returns (EventResponse);
+    rpc sinceMonth(ListRequest) returns (EventResponse);
 }

@@ -93,3 +93,15 @@ func (a *App) GetEventsCurrentMonth(ctx context.Context, ownerID string) ([]stor
 
 	return a.GetEventsFromRange(ctx, ownerID, startOfMonth(now), endOfMonth(now))
 }
+
+func (a *App) GetEventsDayAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error) {
+	return a.GetEventsFromRange(ctx, ownerID, start, endOfDay(start))
+}
+
+func (a *App) GetEventsWeekAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error) {
+	return a.GetEventsFromRange(ctx, ownerID, start, endOfWeek(start))
+}
+
+func (a *App) GetEventsMonthAfter(ctx context.Context, ownerID string, start time.Time) ([]storage.Event, error) {
+	return a.GetEventsFromRange(ctx, ownerID, start, endOfMonth(start))
+}
