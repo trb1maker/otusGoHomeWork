@@ -2,6 +2,56 @@ syntax = "proto3";
 
 package event;
 
+option go_package = "github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/server/grpc/api";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+
 message Event {
-    // TODO
+    string                    id          = 1;
+    string                    title       = 2;
+    google.protobuf.Timestamp startTime   = 3;
+    google.protobuf.Timestamp endTime     = 4;
+    string                    description = 5;
+    string                    owner       = 6;
+    google.protobuf.Duration  notify      = 7;
+}
+
+message EventRequest {
+    string eventId = 1;
+}
+
+message UserRequest {
+    string userId  = 1;
+}
+
+message EventIdResponse {
+    string eventId = 1;
+}
+
+message EventResponse {
+    repeated Event events  = 2;
+}
+
+message ListRequest {
+    string                    userId  = 1;
+    google.protobuf.Timestamp start   = 2;
+}
+
+service EventService {
+    rpc newEvent(Event) returns (EventIdResponse);
+    rpc getEvent(EventRequest) returns (EventResponse);
+    rpc updateEvent(Event) returns (google.protobuf.Empty);
+    rpc deleteEvent(EventRequest) returns (google.protobuf.Empty);
+
+    rpc all(UserRequest) returns (EventResponse);
+    rpc next(UserRequest) returns (EventResponse);
+    rpc day(UserRequest) returns (EventResponse);
+    rpc week(UserRequest) returns (EventResponse);
+    rpc month(UserRequest) returns (EventResponse);
+
+    rpc sinceDay(ListRequest) returns (EventResponse);
+    rpc sinceWeek(ListRequest) returns (EventResponse);
+    rpc sinceMonth(ListRequest) returns (EventResponse);
 }

@@ -31,9 +31,15 @@ type config struct {
 
 type serverConf struct {
 	HTTP *httpConf `yaml:"http"`
+	GRPC *grpcConf `yaml:"grpc"`
 }
 
 type httpConf struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
+type grpcConf struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
 }
