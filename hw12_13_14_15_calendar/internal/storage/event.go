@@ -12,3 +12,12 @@ type Event struct {
 	OwnerID     string        `json:"ownerId"`
 	Notify      time.Duration `json:"notify,omitempty"`
 }
+
+// easyjson:json
+type Notify struct {
+	OwnerID    string    `json:"ownerId"`
+	ID         string    `json:"id"`
+	Title      string    `json:"title"`
+	StartTime  time.Time `json:"startTime"`
+	NotifyTime time.Time `json:"notifyTime"`
+}
