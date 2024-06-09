@@ -1,0 +1,9 @@
+rabbit:
+  host: 192.168.0.103
+  port: 5672
+  user: quest
+  password: quest
+logger:
+  level: info
+  format: text
+interval: 30m
