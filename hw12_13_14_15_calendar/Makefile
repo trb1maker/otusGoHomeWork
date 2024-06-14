@@ -1,4 +1,7 @@
 BIN := "./bin/calendar"
+SCHEDULER := "./bin/calendar_scheduler"
+SENDER := "./bin/calendar_sender"
+
 DOCKER_IMG="calendar:develop"
 
 POSTGRES_HOST="192.168.0.103"
@@ -10,9 +13,11 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 
 build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(SCHEDULER) -ldflags "$(LDFLAGS)" ./cmd/scheduler
+	go build -v -o $(SENDER) -ldflags "$(LDFLAGS)" ./cmd/sender
 
 run: build
-	$(BIN) -config ./configs/config.yaml
+	$(BIN) -config ./configs/calendar_config.yaml
 
 build-img:
 	docker build \
