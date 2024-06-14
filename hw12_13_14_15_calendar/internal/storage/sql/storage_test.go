@@ -76,3 +76,14 @@ func TestStorage(t *testing.T) {
 		require.NoError(t, store.Close(ctx))
 	})
 }
+
+func TestDelete(t *testing.T) {
+	t.SkipNow()
+
+	store, err := New("192.168.0.103", 5432, "otus", "otus", "otus")
+	require.NoError(t, err)
+
+	require.NoError(t, store.DeleteOldEvents(context.Background()))
+
+	require.NoError(t, store.Close(context.TODO()))
+}
