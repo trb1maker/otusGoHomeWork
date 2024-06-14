@@ -1,0 +1,15 @@
+rabbit:
+  host: 192.168.0.103
+  port: 5672
+  user: quest
+  password: quest
+postgres:
+  host: 192.168.0.103
+  port: 5432
+  database: otus
+  user: otus
+  password: 20240518_otus
+logger:
+  level: info
+  format: text
+interval: 30m
