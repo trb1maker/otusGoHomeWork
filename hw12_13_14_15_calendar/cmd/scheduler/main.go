@@ -43,10 +43,6 @@ func main() {
 		slog.Error("failed to connect to storage", "err", err)
 		return
 	}
-	if err != nil {
-		slog.Error("failed to connect to rabbit", "err", err)
-		return
-	}
 	defer storage.Close(context.Background())
 
 	queue, err := queue.New(
@@ -61,20 +57,14 @@ func main() {
 	}
 	defer queue.Close()
 
-	interval, err := time.ParseDuration(config.Interval)
-	if err != nil {
-		slog.Error("failed to parse interval", "err", err)
-		return
-	}
-
-	if err := storage.SetInterval(interval); err != nil {
+	if err := storage.SetInterval(config.Interval); err != nil {
 		slog.Error("failed to set interval", "err", err)
 		return
 	}
 
 	sched := scheduler.New(storage, queue)
 
-	ticker := time.NewTicker(interval)
+	ticker := time.NewTicker(config.Interval)
 	defer ticker.Stop()
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)

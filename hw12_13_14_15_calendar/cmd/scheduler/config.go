@@ -3,15 +3,16 @@ package main
 import (
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/go-yaml/yaml"
 )
 
 type config struct {
-	Rabbit   rabbit   `yaml:"rabbit"`
-	Postgres postgres `yaml:"postgres"`
-	Logger   logger   `yaml:"logger"`
-	Interval string   `yaml:"interval"`
+	Rabbit   rabbit        `yaml:"rabbit"`
+	Postgres postgres      `yaml:"postgres"`
+	Logger   logger        `yaml:"logger"`
+	Interval time.Duration `yaml:"interval"`
 }
 
 type rabbit struct {

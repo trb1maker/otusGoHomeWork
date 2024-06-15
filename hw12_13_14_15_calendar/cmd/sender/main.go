@@ -41,13 +41,7 @@ func main() {
 
 	snd := sender.New(queue)
 
-	interval, err := time.ParseDuration(config.Interval)
-	if err != nil {
-		slog.Error("failed to parse interval", "err", err)
-		return
-	}
-
-	ticker := time.NewTicker(interval)
+	ticker := time.NewTicker(config.Interval)
 	defer ticker.Stop()
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)

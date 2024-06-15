@@ -12,4 +12,4 @@ postgres:
 logger:
   level: info
   format: text
-interval: 30m
+interval: 1m
