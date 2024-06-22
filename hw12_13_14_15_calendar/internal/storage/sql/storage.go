@@ -11,8 +11,11 @@ import (
 	"github.com/trb1maker/otus_golang_home_work/hw12_13_14_15_calendar/internal/storage"
 )
 
+var ErrNotValidInterval = errors.New("interval equal zero")
+
 type Storage struct {
-	db *pgx.Conn
+	db             *pgx.Conn
+	notifyInterval time.Duration
 }
 
 func New(host string, port uint16, dbName string, userName string, userPassword string) (*Storage, error) {
@@ -305,4 +308,64 @@ func (s *Storage) RegisterUser(ctx context.Context) (userID string, err error) {
 		return "", err
 	}
 	return userID, err
+}
+
+func (s *Storage) SetInterval(interval time.Duration) error {
+	if interval == 0 {
+		return ErrNotValidInterval
+	}
+	s.notifyInterval = interval
+	return nil
+}
+
+func (s *Storage) SelectEventsToNotify(ctx context.Context) ([]storage.Notify, error) {
+	rows, err := s.db.QueryEx(
+		ctx,
+		`
+			select
+				user_id,
+				event_id,
+				title,
+				start_time,
+				start_time - "notify" notify_time
+			from otus.events 
+			where "notify" is not null
+			and not is_deleted
+			and start_time - "notify" between current_timestamp and current_timestamp + $1
+		`,
+		nil,
+		s.notifyInterval,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrNoData
+		}
+		return nil, err
+	}
+
+	var (
+		userID, eventID, title string
+		startTime, notifyTime  time.Time
+
+		notify []storage.Notify
+	)
+	for rows.Next() {
+		if err := rows.Scan(&userID, &eventID, &title, &startTime, &notifyTime); err != nil {
+			return nil, err
+		}
+		notify = append(notify, storage.Notify{
+			OwnerID:    userID,
+			ID:         eventID,
+			Title:      title,
+			StartTime:  startTime,
+			NotifyTime: notifyTime,
+		})
+	}
+
+	return notify, nil
+}
+
+func (s *Storage) DeleteOldEvents(ctx context.Context) error {
+	_, err := s.db.ExecEx(ctx, "delete from otus.events where end_time < current_timestamp - interval '1 year';", nil)
+	return err
 }
